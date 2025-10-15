@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jazz/Pop Harmonielehre & Bigband-Arrangement Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box strong {
+            color: #667eea;
+        }
+
+        .question-header {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answers {
+            margin-bottom: 30px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            background: #e3f2fd;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .answer-label {
+            background: white;
+            color: #667eea;
+        }
+
+        .answer-option.correct .answer-label {
+            background: white;
+            color: #4caf50;
+        }
+
+        .answer-option.incorrect .answer-label {
+            background: white;
+            color: #f44336;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .matching-item {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .matching-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        }
+
+        .score-circle.average {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .score-circle.poor {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+
+        .result-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .matching-container {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Jazz/Pop Harmonielehre & Bigband-Arrangement</h1>
+            <p>Musikhochschule Test - Anfängerlevel</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <!-- Start Screen -->
+            <div class="start-screen active" id="startScreen">
+                <div class="start-info">
+                    <h2>Willkommen zum Test!</h2>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>📚 Themen:</strong> Bigband-Arrangement, Lead-Sheets, Jazz/Pop-Harmonielehre</li>
+                            <li><strong>📝 Anzahl Fragen:</strong> 20 Fragen</li>
+                            <li><strong>🎯 Fragetypen:</strong> Multiple Choice, Richtig/Falsch, Zuordnung, offene Fragen</li>
+                            <li><strong>💡 Erklärungen:</strong> Nach jeder Antwort erhalten Sie eine Erklärung</li>
+                            <li><strong>⏱️ Zeit:</strong> Keine Zeitbegrenzung - arbeiten Sie in Ihrem Tempo</li>
+                        </ul>
+                    </div>
+                    <p style="color: #666; margin: 20px 0;">
+                        Dieser Test deckt grundlegende Konzepte der Jazz/Pop-Harmonielehre, 
+                        Bigband-Satzweisen und Lead-Sheet-Notation ab.
+                    </p>
+                    <button class="btn btn-primary" onclick="startTest()">Test beginnen 🎼</button>
+                </div>
+            </div>
+
+            <!-- Question Screen -->
+            <div class="question-screen" id="questionScreen">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Frage 1 von 20</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="answers" id="answersContainer"></div>
+
+                <div class="explanation" id="explanation">
+                    <h4>💡 Erklärung:</h4>
+                    <p id="explanationText"></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Zurück</button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Antwort prüfen</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display:none;">Weiter →</button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div class="result-screen" id="resultScreen">
+                <div class="result-summary">
+                    <h2>Test abgeschlossen! 🎉</h2>
+                    <div class="score-circle" id="scoreCircle">
+                        <span id="scorePercentage">0%</span>
+                    </div>
+                    <div class="result-message" id="resultMessage"></div>
+                    
+                    <div class="result-details">
+                        <div class="result-item">
+                            <span><strong>Richtige Antworten:</strong></span>
+                            <span id="correctCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Falsche Antworten:</strong></span>
+                            <span id="incorrectCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Gesamtpunktzahl:</strong></span>
+                            <span id="totalScore">0/20</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Prozentsatz:</strong></span>
+                            <span id="percentageScore">0%</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="restartTest()">Test wiederholen 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Was ist die typische Besetzung einer traditionellen Bigband?',
+                options: [
+                    '5 Saxophone, 4 Trompeten, 4 Posaunen, Rhythmusgruppe',
+                    '3 Saxophone, 3 Trompeten, 2 Posaunen, Rhythmusgruppe',
+                    '4 Saxophone, 3 Trompeten, 3 Posaunen, Rhythmusgruppe',
+                    '6 Saxophone, 5 Trompeten, 5 Posaunen, Rhythmusgruppe'
+                ],
+                correct: 0,
+                explanation: 'Die klassische Bigband-Besetzung umfasst 5 Saxophone (2 Alt, 2 Tenor, 1 Bariton), 4 Trompeten, 4 Posaunen und eine Rhythmusgruppe (Piano, Bass, Schlagzeug, evtl. Gitarre). Dies ist die Standard-Besetzung seit der Swing-Ära.'
+            },
+            {
+                type: 'true-false',
+                question: 'Ein Lead-Sheet enthält typischerweise nur Melodie, Akkord-Symbole und Text, aber keine ausgeschriebenen Begleitstimmen.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Ein Lead-Sheet ist eine vereinfachte Notation, die nur die wesentlichen Informationen enthält: Melodie, Akkordsymbole (Chord Symbols) und ggf. Text. Die Begleitung wird von den Musikern improvisiert bzw. interpretiert.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Akkordbezeichnung steht für einen Dur-Septakkord?',
+                options: [
+                    'Cmaj7 oder CΔ7',
+                    'C7',
+                    'Cm7',
+                    'Cdim7'
+                ],
+                correct: 0,
+                explanation: 'Cmaj7 oder CΔ7 bezeichnet einen Dur-Septakkord (C-E-G-H). C7 wäre ein Dominant-Septakkord (mit kleiner Septime), Cm7 ein Moll-Septakkord und Cdim7 ein verminderter Septakkord.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Soli" in einem Bigband-Arrangement?',
+                options: [
+                    'Ein improvisiertes Solo eines einzelnen Musikers',
+                    'Ein ausgeschriebener Abschnitt, den eine ganze Sektion unisono spielt',
+                    'Ein geschriebener harmonisierter Abschnitt für eine Instrumentengruppe',
+                    'Ein sehr leiser Abschnitt'
+                ],
+                correct: 2,
+                explanation: 'Ein "Soli" (Plural von Solo) ist ein ausgeschriebener, meist harmonisierter Abschnitt für eine komplette Instrumentengruppe (z.B. Saxophon-Soli). Im Gegensatz zum improvisierten Solo ist dies notiert und wird von mehreren Musikern gemeinsam gespielt.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die II-V-I Kadenz ist eine der wichtigsten harmonischen Progressionen im Jazz.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Absolut richtig! Die II-V-I Kadenz (z.B. Dm7 - G7 - Cmaj7 in C-Dur) ist die fundamentalste Akkordfolge im Jazz. Sie erscheint in unzähligen Standards und bildet die Basis für viele Improvisationen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Instrumentengruppe übernimmt in einer Bigband typischerweise die Melodie in den Tutti-Passagen?',
+                options: [
+                    'Die Posaunen',
+                    'Die Trompeten',
+                    'Die Saxophone',
+                    'Die Rhythmusgruppe'
+                ],
+                correct: 1,
+                explanation: 'Die Trompeten spielen typischerweise die Melodie in Tutti-Passagen aufgrund ihrer durchsetzungsfähigen, hellen Klangfarbe. Saxophone übernehmen oft harmonische Füllstimmen oder Gegenmelodien, während Posaunen die tiefen Harmonien und Basslinien unterstützen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist ein "Turnaround" in der Jazz-Harmonielehre?',
+                options: [
+                    'Eine schnelle Tempoänderung',
+                    'Eine kurze Akkordfolge am Ende eines Formteils, die zur Wiederholung führt',
+                    'Ein rhythmisches Pattern',
+                    'Eine Spieltechnik für Bläser'
+                ],
+                correct: 1,
+                explanation: 'Ein Turnaround ist eine kurze harmonische Phrase (meist 2-4 Takte), die am Ende eines Abschnitts steht und musikalisch zur Wiederholung oder zum nächsten Chorus überleitet. Klassisch: I-VI-II-V (z.B. C-Am7-Dm7-G7).'
+            },
+            {
+                type: 'true-false',
+                question: 'In einem Lead-Sheet werden Dynamik und Artikulation detailliert notiert.',
+                options: ['Richtig', 'Falsch'],
+                correct: 1,
+                explanation: 'Falsch! Lead-Sheets sind bewusst minimalistisch gehalten und enthalten in der Regel keine oder nur wenige Angaben zu Dynamik und Artikulation. Diese Interpretationsdetails werden von den Musikern selbst gestaltet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Akkorderweiterung kennzeichnet einen Dominant-Sept-Akkord mit alterierter None?',
+                options: [
+                    'G7(♭9) oder G7(#9)',
+                    'G7(♭5)',
+                    'Gmaj7(9)',
+                    'G7sus4'
+                ],
+                correct: 0,
+                explanation: 'Alterierte Nonen werden als ♭9 (kleine None) oder #9 (übermäßige None) notiert, z.B. G7(♭9) oder G7(#9). Diese Tensions erzeugen einen charakteristisch "scharfen" Klang und werden häufig in der Auflösung zu Moll-Akkorden verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Drop 2" Voicing in der Bigband-Arrangiertechnik?',
+                options: [
+                    'Das Weglassen des zweiten Tons',
+                    'Das Herabsetzen der zweithöchsten Stimme um eine Oktave',
+                    'Das Spielen nur von zwei Stimmen',
+                    'Eine dynamische Anweisung'
+                ],
+                correct: 1,
+                explanation: 'Bei "Drop 2" Voicing wird die zweithöchste Stimme eines geschlossenen Akkords (Close Voicing) um eine Oktave nach unten versetzt. Dies erweitert den Stimmumfang und erzeugt einen offeneren, volleren Klang - eine Standardtechnik im Bigband-Arrangement.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die Blue Notes (♭3, ♭5, ♭7) sind charakteristische Tonhöhen in der Blues- und Jazz-Skala.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Blue Notes sind die erniedrigte Terz (♭3), verminderte Quinte (♭5) und kleine Septime (♭7). Sie geben Blues und Jazz ihren charakteristischen, "schmutzigen" Sound und stammen aus der afroamerikanischen Musiktradition.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Funktion hat die "Rhythmusgruppe" in einer Bigband?',
+                options: [
+                    'Nur die rhythmische Begleitung',
+                    'Harmonische und rhythmische Grundlage sowie Unterstützung der Soli',
+                    'Melodieführung in allen Stücken',
+                    'Ausschließlich Solofunktion'
+                ],
+                correct: 1,
+                explanation: 'Die Rhythmusgruppe (Piano, Bass, Schlagzeug, evtl. Gitarre) bildet das harmonische und rhythmische Fundament der Bigband. Sie begleitet sowohl Tutti-Passagen als auch Soli, gibt den harmonischen Rahmen vor und sorgt für den "Groove".'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist ein "Shout Chorus" in einem Bigband-Arrangement?',
+                options: [
+                    'Ein gesungener Refrain',
+                    'Ein sehr leiser Abschnitt',
+                    'Ein kraftvoller, klimaktischer Tutti-Abschnitt gegen Ende eines Stücks',
+                    'Ein Schlagzeug-Solo'
+                ],
+                correct: 2,
+                explanation: 'Ein "Shout Chorus" ist ein energiegeladener, oft finaler Tutti-Abschnitt, in dem die ganze Band zusammen spielt. Er ist typischerweise laut, rhythmisch intensiv und bildet den Höhepunkt eines Arrangements. Der Begriff kommt von der "rufenden" Qualität der Bläser.'
+            },
+            {
+                type: 'true-false',
+                question: 'Akkordsymbole wie "C/E" bedeuten einen C-Dur Akkord mit E im Bass.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Die Notation "C/E" (gesprochen: "C über E" oder "C slash E") bezeichnet einen C-Dur Akkord mit E als Basston - also eine erste Umkehrung. Dies ist eine gängige Notation in Lead-Sheets für Bassumkehrungen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala wird typischerweise über einen Moll7-Akkord in der II. Stufe (Dm7 in C-Dur) verwendet?',
+                options: [
+                    'D-Melodisch Moll',
+                    'D-Dorisch',
+                    'D-Harmonisch Moll',
+                    'D-Natürlich Moll (Äolisch)'
+                ],
+                correct: 1,
+                explanation: 'Über einen II-Stufen Moll7-Akkord (Dm7 in C-Dur) wird typischerweise die dorische Skala verwendet (D-E-F-G-A-H-C-D). Die dorische Skala hat eine große Sexte (H), was den charakteristischen Jazz-Moll-Sound erzeugt und gut zur V-I Auflösung führt.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Plunger" als Spielanweisung für Blechbläser?',
+                options: [
+                    'Ein bestimmter Dämpfer (wie ein Saugglocken-Gummi)',
+                    'Sehr laut spielen',
+                    'Eine rhythmische Figur',
+                    'Eine spezielle Atemtechnik'
+                ],
+                correct: 0,
+                explanation: 'Ein "Plunger" ist ein Dämpfer aus Gummi (sieht aus wie ein Pümpel/Saugglocke), der vor den Schalltrichter gehalten wird. Durch Öffnen und Schließen entstehen die charakteristischen "Wah-Wah" Effekte, die typisch für Duke Ellington und traditionellen Jazz sind.'
+            },
+            {
+                type: 'true-false',
+                question: 'Ein Sus4-Akkord (z.B. C7sus4) ersetzt die Terz durch die Quarte.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Bei einem Sus4-Akkord (Suspended 4th) wird die Terz durch die Quarte ersetzt. C7sus4 besteht aus C-F-G-B♭ (statt C-E-G-B♭). Der sus4-Klang erzeugt Spannung, die sich oft zur normalen Terz auflöst.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Notation zeigt in einem Lead-Sheet an, dass ein Akkord über mehrere Takte gehalten werden soll?',
+                options: [
+                    'Wiederholungszeichen',
+                    'Schrägstriche (/) in den folgenden Takten oder einfach keine neuen Akkordsymbole',
+                    'Fermate',
+                    'Bindebogen'
+                ],
+                correct: 1,
+                explanation: 'In Lead-Sheets zeigen entweder Schrägstriche (/) oder das Fehlen neuer Akkordsymbole an, dass der vorherige Akkord weiterhin gilt. Ein Schrägstrich steht oft für einen ganzen Taktschlag mit dem aktuellen Akkord.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist "Comping" in der Jazz-Terminologie?',
+                options: [
+                    'Das Komponieren von Stücken',
+                    'Die rhythmisch-harmonische Begleitung, besonders durch Piano oder Gitarre',
+                    'Das Zusammenstellen einer Band',
+                    'Eine Kompressionstechnik in der Tontechnik'
+                ],
+                correct: 1,
+                explanation: '"Comping" (kurz für "accompanying") bezeichnet die rhythmisch-harmonische Begleitfiguren, die Piano oder Gitarre während Melodie oder Soli spielen. Es beinhaltet das kreative Platzieren von Akkorden im rhythmischen Groove - eine Kunst für sich!'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'In welcher Reihenfolge werden typischerweise die Saxophone in einem Bigband-Satz notiert (von oben nach unten)?',
+                options: [
+                    'Altsax 1, Altsax 2, Tenorsax 1, Tenorsax 2, Baritonsax',
+                    'Tenorsax 1, Tenorsax 2, Altsax 1, Altsax 2, Baritonsax',
+                    'Baritonsax, Tenorsax 1, Tenorsax 2, Altsax 1, Altsax 2',
+                    'Altsax 1, Tenorsax 1, Altsax 2, Tenorsax 2, Baritonsax'
+                ],
+                correct: 0,
+                explanation: 'Die Standard-Reihenfolge in Bigband-Partituren ist: Altsax 1, Altsax 2, Tenorsax 1, Tenorsax 2, Baritonsax (von oben nach unten, hohe zu tiefen Instrumenten). Diese Anordnung folgt der Tonhöhe und ermöglicht übersichtliches Lesen und Arrangieren.'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let answerChecked = false;
+
+        function startTest() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('questionScreen').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            if (q.type === 'multiple-choice' || q.type === 'true-false') {
+                q.options.forEach((option, index) => {
+                    const answerDiv = document.createElement('div');
+                    answerDiv.className = 'answer-option';
+                    answerDiv.onclick = () => selectAnswer(index);
+                    answerDiv.innerHTML = `
+                        <span class="answer-label">${String.fromCharCode(65 + index)}</span>
+                        <span>${option}</span>
+                    `;
+                    answersContainer.appendChild(answerDiv);
+                });
+            }
+            
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('checkBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            
+            answerChecked = false;
+            
+            updateProgressBar();
+        }
+
+        function selectAnswer(index) {
+            if (answerChecked) return;
+            
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            userAnswers[currentQuestion] = index;
+        }
+
+        function checkAnswer() {
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Bitte wählen Sie eine Antwort aus!');
+                return;
+            }
+            
+            answerChecked = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((opt, index) => {
+                opt.classList.add('disabled');
+                if (index === q.correct) {
+                    opt.classList.add('correct');
+                }
+                if (index === userAnswers[currentQuestion] && index !== q.correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+            
+            document.getElementById('explanationText').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                
+                // Restore previous answer
+                if (userAnswers[currentQuestion] !== undefined) {
+                    const options = document.querySelectorAll('.answer-option');
+                    options[userAnswers[currentQuestion]].classList.add('selected');
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('questionScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreCircle = document.getElementById('scoreCircle');
+            
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('totalScore').textContent = `${score}/${questions.length}`;
+            document.getElementById('percentageScore').textContent = percentage + '%';
+            
+            let message = '';
+            let circleClass = '';
+            
+            if (percentage >= 90) {
+                message = '🎉 Hervorragend! Sie haben ein ausgezeichnetes Verständnis!';
+                circleClass = 'excellent';
+            } else if (percentage >= 75) {
+                message = '👏 Sehr gut! Sie beherrschen die Grundlagen solide!';
+                circleClass = 'good';
+            } else if (percentage >= 60) {
+                message = '👍 Gut gemacht! Mit etwas Übung werden Sie noch besser!';
+                circleClass = 'average';
+            } else {
+                message = '📚 Weiter üben! Wiederholen Sie die Grundlagen.';
+                circleClass = 'poor';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            scoreCircle.className = 'score-circle ' + circleClass;
+            
+            updateProgressBar();
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            answerChecked = false;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+    </script>
+</body>
+</html>
