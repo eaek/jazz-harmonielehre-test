@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Improvisation & Skalen - Jazz Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box strong {
+            color: #00f2fe;
+        }
+
+        .question-header {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #00f2fe;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answers {
+            margin-bottom: 30px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            background: #e0f7ff;
+            border-color: #4facfe;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            color: #4facfe;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .answer-label {
+            background: white;
+            color: #4facfe;
+        }
+
+        .answer-option.correct .answer-label {
+            background: white;
+            color: #4caf50;
+        }
+
+        .answer-option.incorrect .answer-label {
+            background: white;
+            color: #f44336;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        }
+
+        .score-circle.average {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .score-circle.poor {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+
+        .result-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎺 Improvisation & Skalen</h1>
+            <p>Test 3: Jazz-Skalen, Modes & Improvisationstechniken</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <div class="start-screen active" id="startScreen">
+                <div class="start-info">
+                    <h2>Willkommen zum Improvisation-Test!</h2>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>📚 Themen:</strong> Modi, Pentatonik, Blues-Skala, Bebop-Skalen, Improvisationskonzepte</li>
+                            <li><strong>📝 Anzahl Fragen:</strong> 20 Fragen</li>
+                            <li><strong>🎯 Level:</strong> Anfänger</li>
+                            <li><strong>💡 Lernmodus:</strong> Mit detaillierten Erklärungen</li>
+                            <li><strong>⏱️ Zeit:</strong> Keine Zeitbegrenzung</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" onclick="startTest()">Test beginnen 🎷</button>
+                </div>
+            </div>
+
+            <div class="question-screen" id="questionScreen">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Frage 1 von 20</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="answers" id="answersContainer"></div>
+
+                <div class="explanation" id="explanation">
+                    <h4>💡 Erklärung:</h4>
+                    <p id="explanationText"></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Zurück</button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Antwort prüfen</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display:none;">Weiter →</button>
+                </div>
+            </div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-summary">
+                    <h2>Test abgeschlossen! 🎉</h2>
+                    <div class="score-circle" id="scoreCircle">
+                        <span id="scorePercentage">0%</span>
+                    </div>
+                    <div class="result-message" id="resultMessage"></div>
+                    
+                    <div class="result-details">
+                        <div class="result-item">
+                            <span><strong>Richtige Antworten:</strong></span>
+                            <span id="correctCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Falsche Antworten:</strong></span>
+                            <span id="incorrectCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Gesamtpunktzahl:</strong></span>
+                            <span id="totalScore">0/20</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Prozentsatz:</strong></span>
+                            <span id="percentageScore">0%</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="restartTest()">Test wiederholen 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Wie viele Töne hat eine Pentatonische Skala?',
+                options: [
+                    '5 Töne',
+                    '7 Töne',
+                    '8 Töne',
+                    '12 Töne'
+                ],
+                correct: 0,
+                explanation: 'Eine Pentatonische Skala hat 5 Töne (griechisch "penta" = fünf). Die Dur-Pentatonik in C wäre: C-D-E-G-A. Sie wird häufig in Jazz, Blues, Rock und Weltmusik verwendet, da sie sehr melodisch klingt und keine dissonanten Intervalle enthält.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala wird typischerweise über einen Moll7-Akkord auf der II. Stufe verwendet?',
+                options: [
+                    'Dorisch',
+                    'Phrygisch',
+                    'Lydisch',
+                    'Mixolydisch'
+                ],
+                correct: 0,
+                explanation: 'Über einen II-Stufen Moll7-Akkord (z.B. Dm7 in C-Dur) wird die dorische Skala verwendet (D-E-F-G-A-H-C-D). Die dorische Skala hat eine große Sexte (H statt B), was den charakteristischen Jazz-Moll-Sound erzeugt und ideal zur II-V-I Kadenz passt.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die Blues-Skala entsteht, wenn man einer Moll-Pentatonik die verminderte Quinte (♭5) hinzufügt.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Die Blues-Skala hat 6 Töne: 1-♭3-4-♭5-5-♭7. In C wäre das: C-E♭-F-G♭-G-B♭. Die hinzugefügte ♭5 (die "Blue Note") gibt der Skala ihren charakteristischen "bluesigen" Sound und wird oft als Durchgangston oder für Spannung verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist ein "Mode" (Modus) in der Musiktheorie?',
+                options: [
+                    'Eine Skala, die von einer bestimmten Stufe einer Dur-Skala ausgeht',
+                    'Eine bestimmte Spieltechnik',
+                    'Ein rhythmisches Pattern',
+                    'Eine Akkordfolge'
+                ],
+                correct: 0,
+                explanation: 'Ein Modus ist eine Skala, die von einer bestimmten Stufe der Dur-Skala (oder anderen Skalen) beginnt. Die 7 Modi der Dur-Skala sind: Ionisch (I), Dorisch (II), Phrygisch (III), Lydisch (IV), Mixolydisch (V), Äolisch (VI), Lokrisch (VII). Jeder hat einen eigenen charakteristischen Klang.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Modus wird typischerweise über einen Dominant7-Akkord (V7) verwendet?',
+                options: [
+                    'Mixolydisch',
+                    'Ionisch',
+                    'Dorisch',
+                    'Lydisch'
+                ],
+                correct: 0,
+                explanation: 'Über einen Dominant7-Akkord (G7 in C-Dur) wird der mixolydische Modus verwendet (G-A-H-C-D-E-F-G). Mixolydisch ist wie eine Dur-Skala mit kleiner Septime (♭7), was perfekt zum Dominant7-Akkord passt, der ebenfalls eine kleine Septime hat.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die Bebop-Skala fügt einer regulären Skala einen chromatischen Durchgangston hinzu, um auf den starken Zählzeiten Akkordtöne zu treffen.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Bebop-Skalen haben 8 Töne (statt 7) durch Hinzufügen eines chromatischen Durchgangstons. Dies sorgt dafür, dass bei Achtellinien die Akkordtöne auf die betonten Zählzeiten (1, 2, 3, 4) fallen - eine wichtige Technik im Bebop-Stil für fließende, melodische Linien.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist die "Alterierte Skala" (auch "Super-Lokrisch" genannt)?',
+                options: [
+                    'Eine Skala über Dominant7-Akkorde mit vielen alterierten Tensions (♭9, #9, ♭5, #5)',
+                    'Eine historische Skala aus dem Mittelalter',
+                    'Eine Skala nur für Moll-Akkorde',
+                    'Eine vereinfachte Pentatonik'
+                ],
+                correct: 0,
+                explanation: 'Die alterierte Skala (7. Modus von Melodisch Moll) wird über alterierte Dominant-Akkorde gespielt. G alteriert: G-A♭-B♭-C♭-D♭-E♭-F. Sie enthält alle möglichen alterierten Tensions (♭9, #9, #11, ♭13) und erzeugt maximale Spannung vor der Auflösung.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Wie viele Töne hat eine chromatische Skala innerhalb einer Oktave?',
+                options: [
+                    '12 Töne',
+                    '7 Töne',
+                    '8 Töne',
+                    '10 Töne'
+                ],
+                correct: 0,
+                explanation: 'Die chromatische Skala enthält alle 12 Halbtöne innerhalb einer Oktave (C-C#-D-D#-E-F-F#-G-G#-A-A#-H-C). Sie wird in der Improvisation für chromatische Durchgänge, Verzierungen und moderne Jazz-Techniken verwendet.'
+            },
+            {
+                type: 'true-false',
+                question: 'Der lydische Modus hat eine übermäßige Quarte (#11), was ihm einen "hellen", schwebenden Charakter gibt.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Der lydische Modus (4. Stufe der Dur-Skala) hat eine #11 (#4). In C-Lydisch: C-D-E-F#-G-A-H. Diese übermäßige Quarte erzeugt einen sehr hellen, "schwebenden" Klang und wird oft über Maj7-Akkorde mit #11-Erweiterung verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Outside Playing" in der Jazz-Improvisation?',
+                options: [
+                    'Bewusst außerhalb der Harmonie spielen, um Spannung zu erzeugen',
+                    'Im Freien auftreten',
+                    'Sehr laut spielen',
+                    'Fehler in der Improvisation'
+                ],
+                correct: 0,
+                explanation: '"Outside Playing" bedeutet, bewusst dissonante Töne oder Skalen zu spielen, die nicht zur aktuellen Harmonie passen. Dies erzeugt Spannung, die dann durch Rückkehr zur Harmonie ("inside") aufgelöst wird. Eine fortgeschrittene Technik für moderne Jazz-Improvisation.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala passt am besten über einen Cmaj7#11 Akkord?',
+                options: [
+                    'C-Lydisch',
+                    'C-Ionisch (Dur)',
+                    'C-Mixolydisch',
+                    'C-Dorisch'
+                ],
+                correct: 0,
+                explanation: 'Über Cmaj7#11 passt C-Lydisch perfekt (C-D-E-F#-G-A-H), da dieser Modus die #11 (F#) enthält, die im Akkord vorkommt. Der lydische Modus ist die natürliche Wahl für Maj7#11-Akkorde und erzeugt einen modernen, offenen Jazz-Sound.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die Ganzton-Skala besteht ausschließlich aus Ganztonschritten und hat 6 verschiedene Töne.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Die Ganzton-Skala (Whole Tone Scale) besteht nur aus Ganztonschritten: C-D-E-F#-G#-A#-(C). Mit 6 Tönen pro Oktave erzeugt sie einen sehr schwebenden, undefinierten Klang. Sie wird oft über augmented (#5) oder Dominant7#5-Akkorde verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was sind "Guide Tones" in der Jazz-Improvisation?',
+                options: [
+                    'Die Terz und Septime eines Akkords, die die Klangqualität definieren',
+                    'Die Grundtöne der Akkorde',
+                    'Verzierungen am Anfang von Phrasen',
+                    'Sehr hohe Töne'
+                ],
+                correct: 0,
+                explanation: 'Guide Tones sind die Terz und Septime eines Akkords - sie definieren die Klangqualität (Dur/Moll, Dominant/Maj7). In der Improvisation helfen sie, durch Akkordfolgen zu navigieren. Besonders wichtig: Guide Tones bewegen sich oft in Halbtonschritten bei II-V-I Kadenzen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala entsteht, wenn man auf dem 6. Ton einer Dur-Skala beginnt?',
+                options: [
+                    'Natürlich Moll (Äolisch)',
+                    'Dorisch',
+                    'Phrygisch',
+                    'Lokrisch'
+                ],
+                correct: 0,
+                explanation: 'Der 6. Modus der Dur-Skala ist Äolisch, auch bekannt als natürlich Moll. Von A in C-Dur: A-H-C-D-E-F-G-A. Dies ist die "normale" Moll-Tonleiter und die relative Moll-Tonleiter zur Dur-Tonleiter (A-Moll ist relativ zu C-Dur).'
+            },
+            {
+                type: 'true-false',
+                question: 'Arpeggios (gebrochene Akkorde) sind eine wichtige Grundlage für Jazz-Improvisation.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Absolut richtig! Arpeggios (Grundton, Terz, Quinte, Septime) sind fundamental für Jazz-Improvisation. Sie definieren die Harmonie klar, helfen beim Navigieren durch Akkordfolgen und bilden das Skelett für melodische Linien. Viele Jazz-Legenden bauen ihre Soli auf Arpeggio-Strukturen auf.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist ein "Lick" in der Jazz-Terminologie?',
+                options: [
+                    'Eine vorgefertigte melodische Phrase oder Pattern',
+                    'Eine spezielle Spieltechnik',
+                    'Ein rhythmisches Element',
+                    'Eine Harmoniefolge'
+                ],
+                correct: 0,
+                explanation: 'Ein "Lick" ist eine kurze, einprägsame melodische Phrase, die Musiker lernen und in verschiedenen Kontexten einsetzen. Licks sind Bausteine der Improvisation - wie Vokabeln einer Sprache. Durch Transponieren und Variieren von Licks entwickelt man einen persönlichen Stil.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala wird häufig über einen verminderten Akkord (dim7) verwendet?',
+                options: [
+                    'Die verminderte Skala (Halbton-Ganzton oder Ganzton-Halbton)',
+                    'Dur-Skala',
+                    'Blues-Skala',
+                    'Pentatonik'
+                ],
+                correct: 0,
+                explanation: 'Über verminderte Akkorde wird die verminderte Skala (Octatonic Scale) verwendet - sie besteht aus alternierenden Halb- und Ganztonschritten: Halbton-Ganzton oder Ganzton-Halbton. Mit 8 Tönen enthält sie alle Töne des dim7-Akkords plus passende Tensions.'
+            },
+            {
+                type: 'true-false',
+                question: 'Beim "Chord-Tone Soloing" improvisiert man hauptsächlich mit den Tönen der zugrunde liegenden Akkorde.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! "Chord-Tone Soloing" bedeutet, hauptsächlich Akkordtöne (1-3-5-7) zu verwenden, ergänzt durch Durchgangstöne. Diese Technik erzeugt stark harmonisch verankerte Soli und ist ideal für Anfänger, um die Harmonie zu "hören" und melodisch zu navigieren.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist der Unterschied zwischen Harmonisch Moll und Melodisch Moll?',
+                options: [
+                    'Melodisch Moll hat eine große Sexte (6) zusätzlich zur großen Septime (7)',
+                    'Es gibt keinen Unterschied',
+                    'Harmonisch Moll hat mehr Töne',
+                    'Melodisch Moll wird nur in Klassik verwendet'
+                ],
+                correct: 0,
+                explanation: 'Harmonisch Moll: 1-2-♭3-4-5-♭6-7 (C-D-E♭-F-G-A♭-H). Melodisch Moll: 1-2-♭3-4-5-6-7 (C-D-E♭-F-G-A-H). Der Unterschied: Melodisch Moll hat eine große Sexte (A statt A♭). Melodisch Moll wird im Jazz häufig verwendet und erzeugt viele wichtige Modi (alteriert, lydisch dominant, etc.).'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Playing the Changes" in der Jazz-Improvisation?',
+                options: [
+                    'Die Akkordwechsel in der Improvisation klar hörbar machen',
+                    'Das Tempo während des Solos ändern',
+                    'Zwischen verschiedenen Stilen wechseln',
+                    'Die Dynamik variieren'
+                ],
+                correct: 0,
+                explanation: '"Playing the Changes" bedeutet, die Harmonie (Akkordwechsel) in der Improvisation klar auszudrücken - durch Akkordtöne, passende Skalen und Guide Tones. Dies ist eine Kernkompetenz im Bebop und Hard Bop, im Gegensatz zu modalen Ansätzen, die länger auf einem Klang verweilen.'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let answerChecked = false;
+
+        function startTest() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('questionScreen').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.onclick = () => selectAnswer(index);
+                answerDiv.innerHTML = `
+                    <span class="answer-label">${String.fromCharCode(65 + index)}</span>
+                    <span>${option}</span>
+                `;
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('checkBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            
+            answerChecked = false;
+            updateProgressBar();
+        }
+
+        function selectAnswer(index) {
+            if (answerChecked) return;
+            
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            userAnswers[currentQuestion] = index;
+        }
+
+        function checkAnswer() {
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Bitte wählen Sie eine Antwort aus!');
+                return;
+            }
+            
+            answerChecked = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((opt, index) => {
+                opt.classList.add('disabled');
+                if (index === q.correct) {
+                    opt.classList.add('correct');
+                }
+                if (index === userAnswers[currentQuestion] && index !== q.correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+            
+            document.getElementById('explanationText').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                
+                if (userAnswers[currentQuestion] !== undefined) {
+                    const options = document.querySelectorAll('.answer-option');
+                    options[userAnswers[currentQuestion]].classList.add('selected');
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('questionScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreCircle = document.getElementById('scoreCircle');
+            
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('totalScore').textContent = `${score}/${questions.length}`;
+            document.getElementById('percentageScore').textContent = percentage + '%';
+            
+            let message = '';
+            let circleClass = '';
+            
+            if (percentage >= 90) {
+                message = '🎉 Exzellent! Ihr Skalenwissen ist beeindruckend!';
+                circleClass = 'excellent';
+            } else if (percentage >= 75) {
+                message = '👏 Sehr gut! Sie haben die Grundlagen der Improvisation verstanden!';
+                circleClass = 'good';
+            } else if (percentage >= 60) {
+                message = '👍 Solide! Vertiefen Sie Ihr Wissen über Modi und Skalen!';
+                circleClass = 'average';
+            } else {
+                message = '📚 Weiter lernen! Üben Sie Skalen und Modi am Instrument!';
+                circleClass = 'poor';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            scoreCircle.className = 'score-circle ' + circleClass;
+            
+            updateProgressBar();
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            answerChecked = false;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+    </script>
+</body>
+</html>

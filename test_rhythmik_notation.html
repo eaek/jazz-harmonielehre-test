@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rhythmik & Notation - Jazz/Pop Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box strong {
+            color: #f5576c;
+        }
+
+        .question-header {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #f5576c;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answers {
+            margin-bottom: 30px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            background: #ffe0e8;
+            border-color: #f5576c;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #f5576c;
+            color: white;
+            border-color: #f5576c;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            color: #f5576c;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .answer-label {
+            background: white;
+            color: #f5576c;
+        }
+
+        .answer-option.correct .answer-label {
+            background: white;
+            color: #4caf50;
+        }
+
+        .answer-option.incorrect .answer-label {
+            background: white;
+            color: #f44336;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(245, 87, 108, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        }
+
+        .score-circle.average {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .score-circle.poor {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+
+        .result-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎼 Rhythmik & Notation im Jazz</h1>
+            <p>Test 2: Swing, Synkopen & Notationskonventionen</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <div class="start-screen active" id="startScreen">
+                <div class="start-info">
+                    <h2>Willkommen zum Rhythmik-Test!</h2>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>📚 Schwerpunkte:</strong> Swing-Feeling, Synkopen, Rhythmische Patterns, Notation</li>
+                            <li><strong>📝 Anzahl Fragen:</strong> 20 Fragen</li>
+                            <li><strong>🎯 Level:</strong> Anfänger</li>
+                            <li><strong>💡 Lernmodus:</strong> Mit ausführlichen Erklärungen</li>
+                            <li><strong>⏱️ Zeit:</strong> Keine Zeitbegrenzung</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" onclick="startTest()">Test beginnen 🥁</button>
+                </div>
+            </div>
+
+            <div class="question-screen" id="questionScreen">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Frage 1 von 20</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="answers" id="answersContainer"></div>
+
+                <div class="explanation" id="explanation">
+                    <h4>💡 Erklärung:</h4>
+                    <p id="explanationText"></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Zurück</button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Antwort prüfen</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display:none;">Weiter →</button>
+                </div>
+            </div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-summary">
+                    <h2>Test abgeschlossen! 🎉</h2>
+                    <div class="score-circle" id="scoreCircle">
+                        <span id="scorePercentage">0%</span>
+                    </div>
+                    <div class="result-message" id="resultMessage"></div>
+                    
+                    <div class="result-details">
+                        <div class="result-item">
+                            <span><strong>Richtige Antworten:</strong></span>
+                            <span id="correctCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Falsche Antworten:</strong></span>
+                            <span id="incorrectCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Gesamtpunktzahl:</strong></span>
+                            <span id="totalScore">0/20</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Prozentsatz:</strong></span>
+                            <span id="percentageScore">0%</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="restartTest()">Test wiederholen 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Swing" im Jazz-Kontext?',
+                options: [
+                    'Achtel werden ungleich gespielt: die erste länger, die zweite kürzer (Triolenfühlung)',
+                    'Alle Noten werden exakt gleich lang gespielt',
+                    'Eine bestimmte Tempoangabe',
+                    'Eine Tanzform aus den 1920er Jahren'
+                ],
+                correct: 0,
+                explanation: 'Swing bezeichnet die charakteristische Interpretation von Achtelnoten im Jazz: Die erste Achtel wird länger, die zweite kürzer gespielt (ähnlich einer Triolen-Phrasierung). Dies wird oft notiert als "♪=♪♪" und erzeugt das typische "Swing-Feeling".'
+            },
+            {
+                type: 'true-false',
+                question: 'In Jazz-Notation bedeuten normale Achtelnoten automatisch, dass sie "geswingt" gespielt werden sollen.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! In Jazz-Charts werden Achtel normal notiert, aber die Spieler interpretieren sie automatisch als Swing-Achtel, sofern nicht explizit "straight eighths" (gerade Achtel) angegeben ist. Dies ist eine grundlegende Konvention der Jazz-Notation.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist eine Synkope?',
+                options: [
+                    'Eine Betonung auf normalerweise unbetonten Zählzeiten',
+                    'Ein sehr schnelles Tempo',
+                    'Eine Art von Dämpfer',
+                    'Ein rhythmisches Pattern aus Afrika'
+                ],
+                correct: 0,
+                explanation: 'Eine Synkope ist die Betonung oder Verlängerung einer normalerweise unbetonten Zählzeit. Dies erzeugt rhythmische Spannung und ist ein fundamentales Element in Jazz, Pop und lateinamerikanischer Musik. Beispiel: Betonung auf "und" statt auf dem Schlag.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Notation zeigt an, dass "straight" (gerade, nicht geswingt) gespielt werden soll?',
+                options: [
+                    'Die Anweisung "straight eighths" oder "♪=♪" über dem Stück',
+                    'Normale Achtel-Notation',
+                    'Punktierte Rhythmen',
+                    'Es gibt keine spezielle Notation dafür'
+                ],
+                correct: 0,
+                explanation: 'Die Anweisung "straight eighths" oder das Symbol "♪=♪" zeigt an, dass Achtelnoten gleichmäßig (nicht geswingt) gespielt werden sollen. Dies findet man z.B. in Latin, Funk oder Rock-Stilen, wo gleichmäßige Achtel gewünscht sind.'
+            },
+            {
+                type: 'true-false',
+                question: 'Im 4/4-Takt werden normalerweise die Zählzeiten 1 und 3 betont.',
+                options: ['Richtig', 'Falsch'],
+                correct: 1,
+                explanation: 'Falsch - zumindest im Jazz! Während in klassischer Musik oft 1 und 3 betont werden, liegt im Jazz die Betonung typischerweise auf den Zählzeiten 2 und 4 (die "Backbeats"). Das Schlagzeug betont 2 und 4 auf der Hi-Hat oder Snare, was den Jazz-Groove ausmacht.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet die Anweisung "2-feel" in einem Jazz-Chart?',
+                options: [
+                    'Der Bass spielt nur auf 1 und 3 (Walking-Bass wird halbiert)',
+                    'Das Tempo wird verdoppelt',
+                    'Nur zwei Instrumente spielen',
+                    'Es werden nur zwei Takte wiederholt'
+                ],
+                correct: 0,
+                explanation: '"2-feel" oder "in 2" bedeutet, dass der Bass nur auf den Zählzeiten 1 und 3 spielt (statt auf allen vier Vierteln beim Walking-Bass). Dies erzeugt ein leichteres, luftigeres Gefühl und wird oft in Balladen oder bestimmten Swing-Abschnitten verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welches rhythmische Pattern wird als "Charleston-Rhythmus" bezeichnet?',
+                options: [
+                    'Lang-kurz-lang-kurz Pattern',
+                    'Achtel-Achtel-Viertel-Viertel',
+                    'Triolen',
+                    'Sechzehntel-Pattern'
+                ],
+                correct: 0,
+                explanation: 'Der Charleston-Rhythmus ist ein lang-kurz Pattern (auch als "dotted rhythm" bekannt), typisch für die Swing-Ära. Er wird oft auf der Hi-Hat oder Ride-Becken gespielt: LANG-kurz-LANG-kurz. Dieser Rhythmus ist fundamental für den Swing-Stil.'
+            },
+            {
+                type: 'true-false',
+                question: 'Ein "Fill" ist eine rhythmische Verzierung, meist vom Schlagzeug, zwischen Phrasen oder am Ende von Abschnitten.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Ein "Fill" (deutsch: Füllung) ist eine kurze rhythmische Einlage, die Lücken zwischen Phrasen ausfüllt oder Übergänge markiert. Das Schlagzeug nutzt Fills besonders häufig, aber auch andere Instrumente können Fills spielen. Sie sorgen für Abwechslung und betonen Formteile.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist ein "Break" in der Jazz-Terminologie?',
+                options: [
+                    'Eine kurze Pause für die Band, während ein Solist alleine spielt',
+                    'Eine Tempoänderung',
+                    'Ein Fehler in der Performance',
+                    'Das Ende eines Stücks'
+                ],
+                correct: 0,
+                explanation: 'Ein "Break" ist ein kurzer Abschnitt (meist 1-2 Takte), in dem die Begleitband pausiert und nur der Solist (oder die Melodie) zu hören ist. Dies schafft dramatische Spannung und ist besonders am Ende von Phrasen oder vor wichtigen Abschnitten effektiv.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Wie wird ein "Cue" (Einsatzzeichen) in Jazz-Charts oft notiert?',
+                options: [
+                    'Mit einer kleinen Note in Klammern oder einer gestrichelten Linie',
+                    'Mit einem roten Kreis',
+                    'Gar nicht, es wird nur mündlich kommuniziert',
+                    'Mit einem Ausrufezeichen'
+                ],
+                correct: 0,
+                explanation: 'Cues (Einsatzzeichen) werden oft als kleine Noten in Klammern oder mit gestrichelten Linien notiert. Sie zeigen wichtige melodische Hinweise aus anderen Stimmen, die einem Musiker helfen, seinen Einsatz zu finden - besonders nach längeren Pausen.'
+            },
+            {
+                type: 'true-false',
+                question: 'Triolen werden im Jazz grundsätzlich als drei gleichwertige Noten pro Schlag gespielt.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Triolen teilen einen Schlag in drei gleiche Teile. Im Jazz werden echte Triolen (mit der "3" markiert) auch tatsächlich gleichmäßig gespielt - im Gegensatz zu normalen Achteln, die geswingt werden. Triolen sind wichtig für bestimmte lateinamerikanische Rhythmen und melodische Verzierungen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet das Zeichen "%%" in Jazz-Charts?',
+                options: [
+                    'Wiederhole die letzten zwei Takte',
+                    'Spiele zwei mal so schnell',
+                    'Prozentangabe für Dynamik',
+                    'Ein spezieller Akkord'
+                ],
+                correct: 0,
+                explanation: 'Das Symbol "%%" (oder auch "%" für einen Takt) ist ein Wiederholungszeichen und bedeutet: "Wiederhole den/die vorherigen Takt(e)". Dies spart Platz in Charts und macht sie übersichtlicher, besonders bei sich wiederholenden Patterns.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist "Stop Time" in der Jazz-Rhythmik?',
+                options: [
+                    'Die Band spielt nur kurze, punktierte Akzente, während der Solist durchgehend spielt',
+                    'Die Musik stoppt komplett',
+                    'Ein sehr langsames Tempo',
+                    'Der Zeitpunkt, an dem das Stück endet'
+                ],
+                correct: 0,
+                explanation: 'Bei "Stop Time" spielt die Band nur kurze, rhythmisch präzise Akzente (oft auf 1 und 3 oder nur auf 1), während der Solist über diese spärliche Begleitung improvisiert. Dies erzeugt große Spannung und Raum für den Solisten - berühmt aus Louis Armstrongs "Potato Head Blues".'
+            },
+            {
+                type: 'true-false',
+                question: 'Im Jazz werden Viertel-Noten auf dem Ride-Becken oft mit einer leichten "Schwankung" (nicht völlig gleichmäßig) gespielt.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Der "Ride-Cymbal Pattern" im Jazz hat eine subtile Ungleichmäßigkeit - die Viertel sind nicht mechanisch gleichmäßig, sondern haben ein organisches "Atmen". Diese Mikro-Timing-Variationen sind Teil des Jazz-Feelings und unterscheiden gute von großartigen Drummern.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was bedeutet "Double Time Feel"?',
+                options: [
+                    'Die rhythmische Dichte verdoppelt sich, aber das Grund-Tempo bleibt gleich',
+                    'Das Tempo wird genau verdoppelt',
+                    'Zwei Schlagzeuger spielen gleichzeitig',
+                    'Der Takt wechselt auf 2/4'
+                ],
+                correct: 0,
+                explanation: '"Double Time Feel" bedeutet, dass die rhythmische Aktivität (z.B. Achtel werden zu Sechzehntel) sich verdoppelt, aber die Harmonie und das Grund-Tempo bleiben gleich. Die Harmoniewechsel bleiben im Original-Tempo, während der rhythmische "Groove" doppelt so schnell wirkt - beliebtes Mittel für Energie-Steigerung.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Taktart wird als "Waltz Time" im Jazz bezeichnet?',
+                options: [
+                    '3/4',
+                    '4/4',
+                    '6/8',
+                    '5/4'
+                ],
+                correct: 0,
+                explanation: 'Der 3/4-Takt wird im Jazz als "Waltz Time" oder "Jazz Waltz" bezeichnet. Bekannte Beispiele sind "Someday My Prince Will Come" oder "Alice in Wonderland". Im Gegensatz zum klassischen Walzer hat der Jazz-Walzer oft einen schwingenden, weniger "oom-pah-pah" Charakter.'
+            },
+            {
+                type: 'true-false',
+                question: 'Ein "Polyrhythmus" entsteht, wenn zwei oder mehr unterschiedliche rhythmische Patterns gleichzeitig gespielt werden.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Polyrhythmus bezeichnet das gleichzeitige Spiel verschiedener rhythmischer Muster - z.B. 3 gegen 2 oder 4 gegen 3. Dies ist besonders in afro-kubanischer Musik und modernem Jazz verbreitet und erzeugt komplexe, spannende rhythmische Texturen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist ein "Hemiola"?',
+                options: [
+                    'Ein rhythmisches Pattern, das die Betonung verschiebt (z.B. 3 gegen 2)',
+                    'Ein italienisches Instrument',
+                    'Eine spezielle Notation für Pausen',
+                    'Ein schnelles Tempo'
+                ],
+                correct: 0,
+                explanation: 'Eine Hemiola ist ein rhythmisches Phänomen, bei dem zwei Takte im 3/4 wie drei Takte im 2/4 klingen (oder ähnliche Verschiebungen). Die Betonungen verschieben sich, was einen "Über-den-Takt-spielen" Effekt erzeugt. Häufig in lateinamerikanischer und moderner Jazz-Musik.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Funktion hat die "Hi-Hat" im typischen Jazz-Schlagzeug-Pattern?',
+                options: [
+                    'Sie markiert die Zählzeiten 2 und 4',
+                    'Sie spielt den Grundpuls auf allen Vierteln',
+                    'Sie wird nur für Fills verwendet',
+                    'Sie ersetzt das Ride-Becken komplett'
+                ],
+                correct: 0,
+                explanation: 'Die Hi-Hat markiert typischerweise die "Backbeats" auf 2 und 4 im Jazz-Schlagzeug-Setup. Dies erzeugt zusammen mit dem Ride-Pattern (Viertel oder Swing-Achtel) den charakteristischen Jazz-Groove. Die 2-und-4 Betonung ist fundamental für das Jazz-Feeling.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die Notation "simile" oder das Zeichen "/" bedeutet: "Fahre fort wie zuvor".',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! "Simile" (italienisch für "ähnlich") oder Schrägstriche "/" bedeuten, dass der Musiker im etablierten Pattern weiterspielen soll. Dies wird besonders in Rhythmus-Notation verwendet, um Platz zu sparen und zu zeigen, dass das Begleitmuster fortgesetzt wird.'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let answerChecked = false;
+
+        function startTest() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('questionScreen').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.onclick = () => selectAnswer(index);
+                answerDiv.innerHTML = `
+                    <span class="answer-label">${String.fromCharCode(65 + index)}</span>
+                    <span>${option}</span>
+                `;
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('checkBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            
+            answerChecked = false;
+            updateProgressBar();
+        }
+
+        function selectAnswer(index) {
+            if (answerChecked) return;
+            
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            userAnswers[currentQuestion] = index;
+        }
+
+        function checkAnswer() {
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Bitte wählen Sie eine Antwort aus!');
+                return;
+            }
+            
+            answerChecked = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((opt, index) => {
+                opt.classList.add('disabled');
+                if (index === q.correct) {
+                    opt.classList.add('correct');
+                }
+                if (index === userAnswers[currentQuestion] && index !== q.correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+            
+            document.getElementById('explanationText').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                
+                if (userAnswers[currentQuestion] !== undefined) {
+                    const options = document.querySelectorAll('.answer-option');
+                    options[userAnswers[currentQuestion]].classList.add('selected');
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('questionScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreCircle = document.getElementById('scoreCircle');
+            
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('totalScore').textContent = `${score}/${questions.length}`;
+            document.getElementById('percentageScore').textContent = percentage + '%';
+            
+            let message = '';
+            let circleClass = '';
+            
+            if (percentage >= 90) {
+                message = '🎉 Hervorragend! Sie haben ein ausgezeichnetes rhythmisches Verständnis!';
+                circleClass = 'excellent';
+            } else if (percentage >= 75) {
+                message = '👏 Sehr gut! Ihr Rhythmus-Wissen ist solide!';
+                circleClass = 'good';
+            } else if (percentage >= 60) {
+                message = '👍 Gut! Mit etwas mehr Übung werden Sie noch sicherer!';
+                circleClass = 'average';
+            } else {
+                message = '📚 Weiter üben! Vertiefen Sie Ihr rhythmisches Verständnis.';
+                circleClass = 'poor';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            scoreCircle.className = 'score-circle ' + circleClass;
+            
+            updateProgressBar();
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            answerChecked = false;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+    </script>
+</body>
+</html>

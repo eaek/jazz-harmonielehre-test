@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jazz Standards & Geschichte</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fa709a 0%, #fee140 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box strong {
+            color: #fa709a;
+        }
+
+        .question-header {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #fa709a;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answers {
+            margin-bottom: 30px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            background: #fff5e8;
+            border-color: #fa709a;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #fa709a;
+            color: white;
+            border-color: #fa709a;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            color: #fa709a;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .answer-label {
+            background: white;
+            color: #fa709a;
+        }
+
+        .answer-option.correct .answer-label {
+            background: white;
+            color: #4caf50;
+        }
+
+        .answer-option.incorrect .answer-label {
+            background: white;
+            color: #f44336;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(250, 112, 154, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        }
+
+        .score-circle.average {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .score-circle.poor {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+
+        .result-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎭 Jazz Standards & Geschichte</h1>
+            <p>Test 4: Repertoire, Komponisten & Jazz-Entwicklung</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <div class="start-screen active" id="startScreen">
+                <div class="start-info">
+                    <h2>Willkommen zum Jazz-Geschichte-Test!</h2>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>📚 Themen:</strong> Jazz Standards, Komponisten, Stilepochen, wichtige Musiker</li>
+                            <li><strong>📝 Anzahl Fragen:</strong> 20 Fragen</li>
+                            <li><strong>🎯 Level:</strong> Anfänger</li>
+                            <li><strong>💡 Lernmodus:</strong> Mit historischen Hintergründen</li>
+                            <li><strong>⏱️ Zeit:</strong> Keine Zeitbegrenzung</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" onclick="startTest()">Test beginnen 🎹</button>
+                </div>
+            </div>
+
+            <div class="question-screen" id="questionScreen">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Frage 1 von 20</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="answers" id="answersContainer"></div>
+
+                <div class="explanation" id="explanation">
+                    <h4>💡 Erklärung:</h4>
+                    <p id="explanationText"></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Zurück</button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Antwort prüfen</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display:none;">Weiter →</button>
+                </div>
+            </div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-summary">
+                    <h2>Test abgeschlossen! 🎉</h2>
+                    <div class="score-circle" id="scoreCircle">
+                        <span id="scorePercentage">0%</span>
+                    </div>
+                    <div class="result-message" id="resultMessage"></div>
+                    
+                    <div class="result-details">
+                        <div class="result-item">
+                            <span><strong>Richtige Antworten:</strong></span>
+                            <span id="correctCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Falsche Antworten:</strong></span>
+                            <span id="incorrectCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Gesamtpunktzahl:</strong></span>
+                            <span id="totalScore">0/20</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Prozentsatz:</strong></span>
+                            <span id="percentageScore">0%</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="restartTest()">Test wiederholen 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Welche Stadt gilt als "Geburtsort des Jazz"?',
+                options: [
+                    'New Orleans',
+                    'Chicago',
+                    'New York',
+                    'Kansas City'
+                ],
+                correct: 0,
+                explanation: 'New Orleans gilt als Geburtsort des Jazz um 1900. Die einzigartige Mischung aus afrikanischen Rhythmen, europäischer Harmonik, Blues, Ragtime und kreolischer Kultur in dieser multikulturellen Hafenstadt schuf die perfekten Bedingungen für die Entstehung des Jazz.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Wer komponierte den Jazz-Standard "Take Five"?',
+                options: [
+                    'Paul Desmond',
+                    'Dave Brubeck',
+                    'Miles Davis',
+                    'John Coltrane'
+                ],
+                correct: 0,
+                explanation: '"Take Five" wurde von Paul Desmond (Alt-Saxophonist) komponiert und 1959 auf dem Album "Time Out" des Dave Brubeck Quartet veröffentlicht. Es ist berühmt für seinen ungewöhnlichen 5/4-Takt und wurde einer der bestverkauften Jazz-Singles aller Zeiten.'
+            },
+            {
+                type: 'true-false',
+                question: 'Louis Armstrong war sowohl ein brillanter Trompeter als auch ein einflussreicher Sänger.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Louis Armstrong (1901-1971) war nicht nur ein revolutionärer Trompeter, der die Jazz-Improvisation prägte, sondern auch ein charismatischer Sänger. Seine raue, warme Stimme und sein Scat-Gesang beeinflussten Generationen von Musikern. Hits wie "What a Wonderful World" machten ihn weltberühmt.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welches Album von Miles Davis gilt als Meilenstein des "Cool Jazz"?',
+                options: [
+                    '"Birth of the Cool"',
+                    '"Kind of Blue"',
+                    '"Bitches Brew"',
+                    '"A Love Supreme"'
+                ],
+                correct: 0,
+                explanation: '"Birth of the Cool" (aufgenommen 1949-1950, veröffentlicht 1957) gilt als Geburtsstunde des Cool Jazz. Miles Davis arbeitete mit Arrangeuren wie Gil Evans, um einen entspannteren, introspektiveren Sound zu schaffen - im Gegensatz zum hektischen Bebop. Das Album verwendete ungewöhnliche Instrumente wie Waldhorn und Tuba.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Form haben die meisten Jazz-Standards?',
+                options: [
+                    '32-taktige AABA-Form',
+                    '12-taktiger Blues',
+                    '16-taktige AB-Form',
+                    'Durchkomponierte Form'
+                ],
+                correct: 0,
+                explanation: 'Die meisten Jazz-Standards aus der "Great American Songbook"-Ära (1920er-1950er) haben eine 32-taktige AABA-Form: zwei 8-taktige A-Abschnitte, ein kontrastierender 8-taktiger B-Abschnitt ("Bridge"), und ein finales A. Beispiele: "I Got Rhythm", "Autumn Leaves", "All the Things You Are".'
+            },
+            {
+                type: 'true-false',
+                question: 'Duke Ellington war hauptsächlich als Bandleader und Komponist für seine eigene Bigband bekannt.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Duke Ellington (1899-1974) war einer der größten Jazz-Komponisten und Bandleader. Er leitete seine Bigband über 50 Jahre und schrieb Tausende Kompositionen ("Mood Indigo", "Sophisticated Lady", "Caravan"). Er nutzte seine Band als "Instrument" und komponierte speziell für die individuellen Klangfarben seiner Musiker.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Pianist gilt als Pionier des "Bebop"?',
+                options: [
+                    'Bud Powell',
+                    'Art Tatum',
+                    'Thelonious Monk',
+                    'Oscar Peterson'
+                ],
+                correct: 0,
+                explanation: 'Bud Powell (1924-1966) gilt als wichtigster Bebop-Pianist. Er übertrug Charlie Parkers revolutionäre Bebop-Linien auf das Piano und entwickelte einen neuen, linearen Stil mit komplexen Melodielinien in der rechten Hand und sparsamen Akkorden links. Seine Aufnahmen der 1940er-50er sind Bebop-Klassiker.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Wer komponierte "Round Midnight", eines der am häufigsten gespielten Jazz-Standards?',
+                options: [
+                    'Thelonious Monk',
+                    'Charlie Parker',
+                    'Dizzy Gillespie',
+                    'John Coltrane'
+                ],
+                correct: 0,
+                explanation: '"Round Midnight" wurde 1944 von Thelonious Monk komponiert und ist eine der meist aufgenommenen Jazz-Kompositionen. Die melancholische Ballade zeigt Monks einzigartigen harmonischen Ansatz. Besonders berühmt ist die Version von Miles Davis aus dem Film "\'Round Midnight" (1986).'
+            },
+            {
+                type: 'true-false',
+                question: 'Charlie Parker spielte Alt-Saxophon und war eine Schlüsselfigur in der Entwicklung des Bebop.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Charlie "Bird" Parker (1920-1955) war Alt-Saxophonist und zusammen mit Dizzy Gillespie Mitbegründer des Bebop in den 1940ern. Seine virtuose Technik, harmonische Innovation und melodische Kreativität revolutionierten den Jazz. Standards wie "Ornithology" und "Anthropology" stammen von ihm.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welches Miles Davis Album aus 1959 gilt als meistverkauftes Jazz-Album aller Zeiten?',
+                options: [
+                    '"Kind of Blue"',
+                    '"Sketches of Spain"',
+                    '"Bitches Brew"',
+                    '"Birth of the Cool"'
+                ],
+                correct: 0,
+                explanation: '"Kind of Blue" (1959) ist das meistverkaufte Jazz-Album der Geschichte (über 5 Millionen Exemplare). Es führte den "Modal Jazz" ein - Improvisation über Modi statt komplexer Akkordfolgen. Mit Bill Evans, John Coltrane, Cannonball Adderley, Paul Chambers und Jimmy Cobb. Tracks: "So What", "Freddie Freeloader", "Blue in Green".'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Sängerin wurde als "First Lady of Song" und "Queen of Jazz" bezeichnet?',
+                options: [
+                    'Ella Fitzgerald',
+                    'Billie Holiday',
+                    'Sarah Vaughan',
+                    'Nina Simone'
+                ],
+                correct: 0,
+                explanation: 'Ella Fitzgerald (1917-1996), die "First Lady of Song", war bekannt für ihre makellose Intonation, ihren großen Stimmumfang und virtuosen Scat-Gesang. Ihre "Songbook"-Serien (Gershwin, Porter, Ellington) sind legendär. Sie gewann 13 Grammy Awards und verkaufte über 40 Millionen Alben.'
+            },
+            {
+                type: 'true-false',
+                question: 'Das "Real Book" ist eine Sammlung von Jazz-Standards mit Lead-Sheets, die ursprünglich illegal zirkulierte.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Das "Real Book" wurde in den 1970ern von Berklee-Studenten illegal zusammengestellt (ohne Urheberrechte). Es wurde zum wichtigsten Werkzeug für Jazz-Musiker weltweit. Seit 2004 gibt es legale, lizenzierte Versionen von Hal Leonard. Es enthält Hunderte Standards mit Lead-Sheets (Melodie + Akkorde).'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Bassist revolutionierte das Jazz-Bass-Spiel mit virtuosen Soli und melodischem Ansatz?',
+                options: [
+                    'Jaco Pastorius',
+                    'Charles Mingus',
+                    'Ron Carter',
+                    'Paul Chambers'
+                ],
+                correct: 0,
+                explanation: 'Jaco Pastorius (1951-1987) revolutionierte das E-Bass-Spiel im Jazz mit seinem bundlosen Fender Jazz Bass. Seine harmonischen Kenntnisse, melodischen Soli und perkussiven Techniken auf Alben wie "Heavy Weather" (Weather Report) machten ihn zur Legende. Er zeigte, dass Bass ein vollwertiges Solo-Instrument sein kann.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'In welcher Epoche entwickelte sich der "Swing"-Stil mit großen Bigbands?',
+                options: [
+                    '1930er-1940er Jahre',
+                    '1910er-1920er Jahre',
+                    '1950er-1960er Jahre',
+                    '1970er-1980er Jahre'
+                ],
+                correct: 0,
+                explanation: 'Die "Swing-Ära" war in den 1930er-1940er Jahren. Große Bigbands unter Leitung von Duke Ellington, Count Basie, Benny Goodman und Glenn Miller dominierten. Swing war Tanzmusik und erreichte Mainstream-Popularität. Der Stil betonte das "Swing-Feeling", Call-and-Response zwischen Bläser-Sektionen und arrangierte Soli.'
+            },
+            {
+                type: 'true-false',
+                question: 'John Coltrane komponierte "Giant Steps", bekannt für seine extrem schnellen und harmonisch komplexen Akkordwechsel.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! "Giant Steps" (1960) ist John Coltranes Meisterwerk mit den berüchtigten "Coltrane Changes" - schnelle Akkordwechsel durch drei Tonzentren (H-G-Es), die in großen Terzen verwandt sind. Das Stück ist eine der größten Herausforderungen für Jazz-Improvisierer und zeigt Coltranes harmonisches Genie.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Komponist schrieb "Autumn Leaves" ("Les Feuilles Mortes")?',
+                options: [
+                    'Joseph Kosma',
+                    'George Gershwin',
+                    'Cole Porter',
+                    'Jerome Kern'
+                ],
+                correct: 0,
+                explanation: '"Autumn Leaves" (franz. "Les Feuilles Mortes") wurde 1945 von Joseph Kosma (Musik) und Jacques Prévert (Text) komponiert. Der Song wurde ein Jazz-Standard nach der englischen Version von Johnny Mercer (1947). Die II-V-I Progressionen und die schöne Melodie machen ihn ideal für Jazz-Interpretation und Improvisation.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Stil entstand in den 1970ern durch Verschmelzung von Jazz mit Rock und Funk?',
+                options: [
+                    'Jazz Fusion',
+                    'Cool Jazz',
+                    'Hard Bop',
+                    'Free Jazz'
+                ],
+                correct: 0,
+                explanation: 'Jazz Fusion (oder "Fusion") entstand in den späten 1960er-frühen 1970ern durch Kombination von Jazz-Improvisation mit Rock-Rhythmen, E-Instrumenten und Funk-Grooves. Pioniere: Miles Davis ("Bitches Brew"), Weather Report, Mahavishnu Orchestra, Return to Forever, Herbie Hancock ("Head Hunters"). Fusion nutzte Synthesizer, E-Bass und Rock-Schlagzeug.'
+            },
+            {
+                type: 'true-false',
+                question: 'Dizzy Gillespie war bekannt für sein charakteristisches, nach oben gebogenes Trompeten-Bell und seine aufgeblasenen Backen beim Spielen.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Dizzy Gillespies (1917-1993) Trompete mit dem 45°-nach-oben-gebogenen Bell wurde zu seinem Markenzeichen (ursprünglich durch Unfall entstanden). Seine aufgeblasenen Backen waren ebenfalls charakteristisch. Er war Bebop-Mitbegründer, brillanter Improvisator und brachte afro-kubanische Rhythmen in den Jazz ("A Night in Tunisia").'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welches Instrument spielte Bill Evans, einer der einflussreichsten Musiker im Modal Jazz?',
+                options: [
+                    'Piano',
+                    'Saxophon',
+                    'Trompete',
+                    'Bass'
+                ],
+                correct: 0,
+                explanation: 'Bill Evans (1929-1980) war Pianist und spielte auf Miles Davis\' "Kind of Blue". Sein impressionistischer Stil, seine Harmonievoicings und sein sensitives Trio-Spiel (mit Scott LaFaro und Paul Motian) beeinflussten Generationen von Pianisten. Seine Interpretationen von Standards wie "Waltz for Debby" sind legendär.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Komponist schrieb "Body and Soul", einen der wichtigsten Jazz-Balladen-Standards?',
+                options: [
+                    'Johnny Green',
+                    'George Gershwin',
+                    'Duke Ellington',
+                    'Richard Rodgers'
+                ],
+                correct: 0,
+                explanation: '"Body and Soul" wurde 1930 von Johnny Green komponiert (Text: Edward Heyman, Robert Sour, Frank Eyton). Coleman Hawkins\' 1939er Aufnahme machte es zum Jazz-Standard und gilt als eine der ersten großartigen Tenor-Sax-Improvisationen. Die komplexe Harmonie (AABA, 32 Takte) ist perfekt für kreative Reharmonisierung.'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let answerChecked = false;
+
+        function startTest() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('questionScreen').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.onclick = () => selectAnswer(index);
+                answerDiv.innerHTML = `
+                    <span class="answer-label">${String.fromCharCode(65 + index)}</span>
+                    <span>${option}</span>
+                `;
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('checkBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            
+            answerChecked = false;
+            updateProgressBar();
+        }
+
+        function selectAnswer(index) {
+            if (answerChecked) return;
+            
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            userAnswers[currentQuestion] = index;
+        }
+
+        function checkAnswer() {
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Bitte wählen Sie eine Antwort aus!');
+                return;
+            }
+            
+            answerChecked = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((opt, index) => {
+                opt.classList.add('disabled');
+                if (index === q.correct) {
+                    opt.classList.add('correct');
+                }
+                if (index === userAnswers[currentQuestion] && index !== q.correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+            
+            document.getElementById('explanationText').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                
+                if (userAnswers[currentQuestion] !== undefined) {
+                    const options = document.querySelectorAll('.answer-option');
+                    options[userAnswers[currentQuestion]].classList.add('selected');
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('questionScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreCircle = document.getElementById('scoreCircle');
+            
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('totalScore').textContent = `${score}/${questions.length}`;
+            document.getElementById('percentageScore').textContent = percentage + '%';
+            
+            let message = '';
+            let circleClass = '';
+            
+            if (percentage >= 90) {
+                message = '🎉 Fantastisch! Sie sind ein wahrer Jazz-Kenner!';
+                circleClass = 'excellent';
+            } else if (percentage >= 75) {
+                message = '👏 Sehr gut! Ihr Jazz-Wissen ist beeindruckend!';
+                circleClass = 'good';
+            } else if (percentage >= 60) {
+                message = '👍 Gut! Hören Sie mehr Jazz und lernen Sie die Klassiker!';
+                circleClass = 'average';
+            } else {
+                message = '📚 Entdecken Sie die Welt des Jazz! Hören Sie die großen Standards!';
+                circleClass = 'poor';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            scoreCircle.className = 'score-circle ' + circleClass;
+            
+            updateProgressBar();
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            answerChecked = false;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+    </script>
+</body>
+</html>
