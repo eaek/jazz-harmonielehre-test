@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melodisch & Harmonisch Moll - Musiktheorie Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box strong {
+            color: #764ba2;
+        }
+
+        .question-header {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #764ba2;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answers {
+            margin-bottom: 30px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            background: #e8e4f3;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            color: #667eea;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .answer-label {
+            background: white;
+            color: #667eea;
+        }
+
+        .answer-option.correct .answer-label {
+            background: white;
+            color: #4caf50;
+        }
+
+        .answer-option.incorrect .answer-label {
+            background: white;
+            color: #f44336;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        }
+
+        .score-circle.average {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .score-circle.poor {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+
+        .result-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎼 Melodisch & Harmonisch Moll</h1>
+            <p>Test 4: Moll-Skalen, Modi & Anwendung in der Praxis</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressBar"></div>
+        </div>
+
+        <div class="content">
+            <div class="start-screen active" id="startScreen">
+                <div class="start-info">
+                    <h2>Willkommen zum Moll-Skalen Test!</h2>
+                    <div class="info-box">
+                        <ul>
+                            <li><strong>📚 Themen:</strong> Natürlich/Harmonisch/Melodisch Moll, Modi, Skalenanwendung, Jazz-Theorie</li>
+                            <li><strong>📝 Anzahl Fragen:</strong> 20 Fragen</li>
+                            <li><strong>🎯 Level:</strong> Anfänger bis Fortgeschritten</li>
+                            <li><strong>💡 Lernmodus:</strong> Mit detaillierten Erklärungen</li>
+                            <li><strong>⏱️ Zeit:</strong> Keine Zeitbegrenzung</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary" onclick="startTest()">Test beginnen 🎹</button>
+                </div>
+            </div>
+
+            <div class="question-screen" id="questionScreen">
+                <div class="question-header">
+                    <div class="question-number" id="questionNumber">Frage 1 von 20</div>
+                    <div class="question-text" id="questionText"></div>
+                </div>
+
+                <div class="answers" id="answersContainer"></div>
+
+                <div class="explanation" id="explanation">
+                    <h4>💡 Erklärung:</h4>
+                    <p id="explanationText"></p>
+                </div>
+
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Zurück</button>
+                    <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Antwort prüfen</button>
+                    <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display:none;">Weiter →</button>
+                </div>
+            </div>
+
+            <div class="result-screen" id="resultScreen">
+                <div class="result-summary">
+                    <h2>Test abgeschlossen! 🎉</h2>
+                    <div class="score-circle" id="scoreCircle">
+                        <span id="scorePercentage">0%</span>
+                    </div>
+                    <div class="result-message" id="resultMessage"></div>
+                    
+                    <div class="result-details">
+                        <div class="result-item">
+                            <span><strong>Richtige Antworten:</strong></span>
+                            <span id="correctCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Falsche Antworten:</strong></span>
+                            <span id="incorrectCount">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Gesamtpunktzahl:</strong></span>
+                            <span id="totalScore">0/20</span>
+                        </div>
+                        <div class="result-item">
+                            <span><strong>Prozentsatz:</strong></span>
+                            <span id="percentageScore">0%</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" onclick="restartTest()">Test wiederholen 🔄</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                type: 'multiple-choice',
+                question: 'Welche Töne hat die natürliche A-Moll Skala?',
+                options: [
+                    'A-H-C-D-E-F-G-A',
+                    'A-H-C#-D-E-F#-G#-A',
+                    'A-H-C-D-E-F-G#-A',
+                    'A-H-C-D-E-F#-G-A'
+                ],
+                correct: 0,
+                explanation: 'Die natürliche Moll-Skala (Äolisch) von A ist A-H-C-D-E-F-G-A. Sie entspricht dem 6. Modus der C-Dur Tonleiter und hat keine Vorzeichen. Dies ist die "reine" Moll-Tonleiter ohne Erhöhungen.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist der Hauptunterschied zwischen Harmonisch Moll und natürlich Moll?',
+                options: [
+                    'Harmonisch Moll hat eine große Septime (7)',
+                    'Harmonisch Moll hat eine große Sexte (6)',
+                    'Harmonisch Moll hat mehr Töne',
+                    'Es gibt keinen Unterschied'
+                ],
+                correct: 0,
+                explanation: 'Harmonisch Moll erhöht die 7. Stufe um einen Halbton (große Septime). In A-Moll: A-H-C-D-E-F-G#-A. Dies erzeugt einen Leitton zum Grundton und ermöglicht einen Dominant7-Akkord (E7), was zu stärkeren harmonischen Kadenzen führt.'
+            },
+            {
+                type: 'true-false',
+                question: 'Melodisch Moll hat sowohl eine große Sexte (6) als auch eine große Septime (7).',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Melodisch Moll in A: A-H-C-D-E-F#-G#-A (aufwärts). Sie hat beide erhöhte Stufen: die große Sexte (F#) und große Septime (G#). Im Jazz wird diese Skala sowohl auf- als auch abwärts gleich gespielt, in der Klassik wird abwärts die natürliche Moll verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche charakteristische Intervallstruktur entsteht in der Harmonisch-Moll-Skala?',
+                options: [
+                    'Eine übermäßige Sekunde zwischen der 6. und 7. Stufe',
+                    'Eine verminderte Quinte',
+                    'Ein Tritonus am Anfang',
+                    'Eine große Septime am Anfang'
+                ],
+                correct: 0,
+                explanation: 'Harmonisch Moll hat eine übermäßige Sekunde (3 Halbtöne) zwischen ♭6 und 7. In A-Moll ist das F zu G# (1½ Ganztöne). Dies erzeugt den charakteristischen "orientalischen" oder "exotischen" Klang dieser Skala.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Modi entsteht auf der 7. Stufe von Harmonisch Moll?',
+                options: [
+                    'Superlokrisch (alteriert Diminished)',
+                    'Lokrisch',
+                    'Phrygisch Dominant',
+                    'Dorisch ♭2'
+                ],
+                correct: 0,
+                explanation: 'Der 7. Modus von Harmonisch Moll ist Superlokrisch (auch "alteriert Diminished"). Von G# in A-Moll harmonisch: G#-A-H-C-D-E-F-G#. Dieser Modus hat eine verminderte Quarte und wird über verminderte Akkorde verwendet.'
+            },
+            {
+                type: 'true-false',
+                question: 'Der 5. Modus von Harmonisch Moll wird "Phrygisch Dominant" genannt und klingt sehr orientalisch.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Phrygisch Dominant (5. Modus von Harmonisch Moll) hat die Struktur: 1-♭2-3-4-5-♭6-♭7. Von E in A-Moll harmonisch: E-F-G#-A-H-C-D-E. Der Klang kombiniert die ♭2 (spanisch/orientalisch) mit einer großen Terz, was einen sehr exotischen, dominant-artigen Sound erzeugt.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Modus von Melodisch Moll wird am häufigsten im Jazz über Dominant7-Akkorde verwendet?',
+                options: [
+                    'Lydisch Dominant (4. Modus)',
+                    'Dorisch ♭2 (2. Modus)',
+                    'Lokrisch #2 (6. Modus)',
+                    'Superlokrisch (7. Modus)'
+                ],
+                correct: 0,
+                explanation: 'Lydisch Dominant (4. Modus von Melodisch Moll) hat die Struktur: 1-2-3-#4-5-6-♭7. Es ist wie Mixolydisch mit #11, ideal für Dominant7#11-Akkorde. Von D in A-Melodisch Moll: D-E-F#-G#-A-H-C-D. Wird häufig über Dominant-Akkorde in Jazz-Balladen verwendet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist die "Alterierte Skala" und woher kommt sie?',
+                options: [
+                    'Der 7. Modus von Melodisch Moll mit allen alterierten Tensions',
+                    'Eine chromatische Variation der Blues-Skala',
+                    'Eine historische mittelalterliche Skala',
+                    'Eine moderne Erfindung ohne theoretische Basis'
+                ],
+                correct: 0,
+                explanation: 'Die alterierte Skala ist der 7. Modus von Melodisch Moll. Von G# in A-Melodisch Moll: G#-A-H-C-D-E-F#-G#. Wenn man sie von G aus betrachtet (enharmonisch): G-A♭-B♭-C♭(=H)-D♭-E♭-F-G. Sie enthält alle alterierten Tensions: ♭9, #9, #11(=♭5), ♭13 und wird über alterierte Dominant-Akkorde (G7alt) gespielt.'
+            },
+            {
+                type: 'true-false',
+                question: 'Die Melodisch-Moll-Skala wird im Jazz gleich auf- und absteigend gespielt.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! In der klassischen Musik wird Melodisch Moll aufwärts mit erhöhter 6. und 7. Stufe gespielt, abwärts wie natürlich Moll. Im Jazz verwendet man jedoch die aufsteigende Form durchgehend (Jazz Minor), da dies mehr harmonische Möglichkeiten bietet und die Modi konsistent bleiben.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welcher Akkord entsteht auf der I. Stufe von Harmonisch Moll?',
+                options: [
+                    'Moll-Mj7 (z.B. Am(maj7))',
+                    'Moll7 (z.B. Am7)',
+                    'Dur7 (z.B. A7)',
+                    'Vermindert (z.B. Adim)'
+                ],
+                correct: 0,
+                explanation: 'Auf der I. Stufe von Harmonisch Moll entsteht ein Moll-Major7-Akkord (mMaj7). In A-Moll harmonisch: A-C-E-G#. Der Akkord kombiniert einen Moll-Dreiklang mit großer Septime und hat einen charakteristischen, leicht düsteren, mysteriösen Klang.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Über welchen Akkordtyp wird typischerweise Dorisch ♭2 (2. Modus von Melodisch Moll) verwendet?',
+                options: [
+                    'Moll7-Akkorde mit ♭9',
+                    'Dominant7-Akkorde',
+                    'Major7-Akkorde',
+                    'Verminderte Akkorde'
+                ],
+                correct: 0,
+                explanation: 'Dorisch ♭2 (auch "Phrygian Natural 6") wird über Moll7♭9-Akkorde verwendet. Von H in A-Melodisch Moll: H-C-D-E-F#-G#-A-H (1-♭2-♭3-4-5-6-♭7). Es ist wie Phrygisch, aber mit großer Sexte, was einen dunkleren, moderneren Klang als normales Dorisch erzeugt.'
+            },
+            {
+                type: 'true-false',
+                question: 'Der 6. Modus von Melodisch Moll wird "Lokrisch #2" genannt und über halbverminderte Akkorde (m7♭5) verwendet.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Lokrisch #2 (6. Modus von Melodisch Moll) hat die Struktur: 1-2-♭3-4-♭5-♭6-♭7. Von F# in A-Melodisch Moll: F#-G#-A-H-C-D-E-F#. Es ist wie Lokrisch, aber mit großer Sekunde statt ♭2, was eine modernere Alternative für m7♭5-Akkorde bietet.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist der charakteristische Klang des 3. Modus von Melodisch Moll?',
+                options: [
+                    'Lydisch Augmented - Dur-Klang mit #4 und #5',
+                    'Moll mit großer Septime',
+                    'Dominant mit ♭9',
+                    'Vermindert'
+                ],
+                correct: 0,
+                explanation: 'Der 3. Modus von Melodisch Moll ist Lydisch Augmented: 1-2-3-#4-#5-6-7. Von C in A-Melodisch Moll: C-D-E-F#-G#-A-H-C. Er wird über Maj7#5-Akkorde (Augmented Major7) gespielt und hat einen sehr hellen, schwebenden, modernen Klang durch die übermäßige Quinte und übermäßige Quarte.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'In einer II-V-I Kadenz in Moll, welche Skala passt am besten über den V-Akkord (Dominant)?',
+                options: [
+                    'Harmonisch Moll vom Grundton der Tonart (ergibt Phrygisch Dominant über V)',
+                    'Natürlich Moll',
+                    'Dorisch',
+                    'Pentatonik'
+                ],
+                correct: 0,
+                explanation: 'In einer Moll II-V-I (z.B. Hm7♭5 - E7 - Am) verwendet man über E7 oft die A-Harmonisch-Moll-Skala, was E-Phrygisch-Dominant ergibt: E-F-G#-A-H-C-D-E. Dies betont den Leitton (G#) und erzeugt die klassische Moll-Kadenz-Spannung. Alternativ funktioniert auch die alterierte Skala (E-alteriert).'
+            },
+            {
+                type: 'true-false',
+                question: 'Die "Melodische Moll-Kadenz" verwendet auf der IV-Stufe einen Maj7#5-Akkord.',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! In Melodisch Moll entsteht auf der IV-Stufe ein Maj7#5-Akkord. In A-Melodisch Moll wäre das D-Maj7#5 (D-F#-A#-C#). Diese farbige Kadenz (z.B. DMaj7#5 - E7 - Am) ist charakteristisch für moderne Jazz-Kompositionen und modal-jazz.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Warum wird Melodisch Moll oft als "Jazz Minor" bezeichnet?',
+                options: [
+                    'Weil sie im Jazz fundamental ist und viele wichtige Modi liefert',
+                    'Weil sie nur im Jazz verwendet wird',
+                    'Weil sie von Jazz-Musikern erfunden wurde',
+                    'Weil sie eine Blues-Note enthält'
+                ],
+                correct: 0,
+                explanation: 'Melodisch Moll wird "Jazz Minor" genannt, weil sie im modernen Jazz zentral ist. Ihre 7 Modi (besonders alteriert, Lydisch Dominant, Dorisch ♭2, Lokrisch #2) sind essentiell für Jazz-Harmonik. Sie ermöglicht sophisticated Klangfarben über verschiedene Akkordtypen und ist fundamentaler Bestandteil der Jazz-Theorie seit der Bebop-Ära.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala würdest du über einen Gm(maj7)-Akkord spielen?',
+                options: [
+                    'G-Melodisch Moll',
+                    'G-Harmonisch Moll',
+                    'G-Dorisch',
+                    'G-Dur'
+                ],
+                correct: 0,
+                explanation: 'Über Gm(maj7) passt G-Melodisch Moll perfekt: G-A-B♭-C-D-E-F#-G. Der Akkord Gm(maj7) besteht aus G-B♭-D-F#, alle diese Töne sind in G-Melodisch Moll enthalten. Diese Kombination erzeugt einen modernen, jazzigen Moll-Sound mit der charakteristischen großen Septime.'
+            },
+            {
+                type: 'true-false',
+                question: 'Der Akkord auf der II. Stufe von Harmonisch Moll ist ein halbverminderter Akkord (m7♭5).',
+                options: ['Richtig', 'Falsch'],
+                correct: 0,
+                explanation: 'Richtig! Auf der II. Stufe von Harmonisch Moll entsteht ein m7♭5-Akkord. In A-Harmonisch Moll ist das Hm7♭5 (H-D-F-A). Dies ist typisch für die Moll II-V-I Kadenz: IIm7♭5 - V7 - Im(maj7), eine der wichtigsten Kadenzen im Jazz.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Welche Skala verwendest du am besten über einen Bm7♭5-Akkord in der Tonart A-Moll?',
+                options: [
+                    'Lokrisch #2 (H-Lokrisch #2) oder H-Lokrisch',
+                    'H-Dorisch',
+                    'H-Dur',
+                    'H-Mixolydisch'
+                ],
+                correct: 0,
+                explanation: 'Über Hm7♭5 in A-Moll funktionieren zwei Optionen: 1) H-Lokrisch (von C-Dur): H-C-D-E-F-G-A - passt zur natürlichen Moll-Umgebung. 2) H-Lokrisch #2 (von A-Melodisch Moll): H-C#-D-E-F-G-A - moderner Sound. Die Wahl hängt vom harmonischen Kontext ab. Lokrisch #2 klingt weniger dunkel durch die große Sekunde.'
+            },
+            {
+                type: 'multiple-choice',
+                question: 'Was ist der praktische Vorteil von Melodisch Moll gegenüber Harmonisch Moll?',
+                options: [
+                    'Melodisch Moll vermeidet die übermäßige Sekunde und ist melodischer zu spielen',
+                    'Melodisch Moll hat mehr Töne',
+                    'Melodisch Moll ist einfacher zu lernen',
+                    'Melodisch Moll klingt immer besser'
+                ],
+                correct: 0,
+                explanation: 'Der Hauptvorteil von Melodisch Moll: Sie vermeidet die übermäßige Sekunde (F-G# in A-Moll) von Harmonisch Moll durch Erhöhung auch der 6. Stufe (F#). Das macht sie melodischer und flüssiger zu spielen. Die Skala folgt besser natürlichen melodischen Linien, daher der Name "melodisch". Gleichzeitig behält sie den Leitton (G#) für harmonische Funktionalität.'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+        let answerChecked = false;
+
+        function startTest() {
+            document.getElementById('startScreen').classList.remove('active');
+            document.getElementById('questionScreen').classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            document.getElementById('questionNumber').textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+            document.getElementById('questionText').textContent = q.question;
+            
+            const answersContainer = document.getElementById('answersContainer');
+            answersContainer.innerHTML = '';
+            
+            q.options.forEach((option, index) => {
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-option';
+                answerDiv.onclick = () => selectAnswer(index);
+                answerDiv.innerHTML = `
+                    <span class="answer-label">${String.fromCharCode(65 + index)}</span>
+                    <span>${option}</span>
+                `;
+                answersContainer.appendChild(answerDiv);
+            });
+            
+            document.getElementById('explanation').classList.remove('show');
+            document.getElementById('checkBtn').style.display = 'block';
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('prevBtn').disabled = currentQuestion === 0;
+            
+            answerChecked = false;
+            updateProgressBar();
+        }
+
+        function selectAnswer(index) {
+            if (answerChecked) return;
+            
+            const options = document.querySelectorAll('.answer-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            options[index].classList.add('selected');
+            userAnswers[currentQuestion] = index;
+        }
+
+        function checkAnswer() {
+            if (userAnswers[currentQuestion] === undefined) {
+                alert('Bitte wählen Sie eine Antwort aus!');
+                return;
+            }
+            
+            answerChecked = true;
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.answer-option');
+            
+            options.forEach((opt, index) => {
+                opt.classList.add('disabled');
+                if (index === q.correct) {
+                    opt.classList.add('correct');
+                }
+                if (index === userAnswers[currentQuestion] && index !== q.correct) {
+                    opt.classList.add('incorrect');
+                }
+            });
+            
+            if (userAnswers[currentQuestion] === q.correct) {
+                score++;
+            }
+            
+            document.getElementById('explanationText').textContent = q.explanation;
+            document.getElementById('explanation').classList.add('show');
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'block';
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                loadQuestion();
+                
+                if (userAnswers[currentQuestion] !== undefined) {
+                    const options = document.querySelectorAll('.answer-option');
+                    options[userAnswers[currentQuestion]].classList.add('selected');
+                }
+            }
+        }
+
+        function updateProgressBar() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function showResults() {
+            document.getElementById('questionScreen').classList.remove('active');
+            document.getElementById('resultScreen').classList.add('active');
+            
+            const percentage = Math.round((score / questions.length) * 100);
+            const scoreCircle = document.getElementById('scoreCircle');
+            
+            document.getElementById('scorePercentage').textContent = percentage + '%';
+            document.getElementById('correctCount').textContent = score;
+            document.getElementById('incorrectCount').textContent = questions.length - score;
+            document.getElementById('totalScore').textContent = `${score}/${questions.length}`;
+            document.getElementById('percentageScore').textContent = percentage + '%';
+            
+            let message = '';
+            let circleClass = '';
+            
+            if (percentage >= 90) {
+                message = '🎉 Exzellent! Sie beherrschen Moll-Skalen meisterhaft!';
+                circleClass = 'excellent';
+            } else if (percentage >= 75) {
+                message = '👏 Sehr gut! Ihr Verständnis von Moll-Modi ist stark!';
+                circleClass = 'good';
+            } else if (percentage >= 60) {
+                message = '👍 Gut! Vertiefen Sie Ihr Wissen über die Modi!';
+                circleClass = 'average';
+            } else {
+                message = '📚 Weiter lernen! Üben Sie die Skalen am Instrument!';
+                circleClass = 'poor';
+            }
+            
+            document.getElementById('resultMessage').textContent = message;
+            scoreCircle.className = 'score-circle ' + circleClass;
+            
+            updateProgressBar();
+        }
+
+        function restartTest() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            answerChecked = false;
+            
+            document.getElementById('resultScreen').classList.remove('active');
+            document.getElementById('startScreen').classList.add('active');
+            document.getElementById('progressBar').style.width = '0%';
+        }
+    </script>
+</body>
+</html>
