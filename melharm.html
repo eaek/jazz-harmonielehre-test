@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonisch & Melodisch Moll – Modi & Skalen</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .start-screen, .question-screen, .result-screen {
+            display: none;
+        }
+
+        .start-screen.active, .question-screen.active, .result-screen.active {
+            display: block;
+        }
+
+        .start-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .start-info h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .info-box li:last-child {
+            border-bottom: none;
+        }
+
+        .info-box strong {
+            color: #00f2fe;
+        }
+
+        .question-header {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #00f2fe;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .answers {
+            margin-bottom: 30px;
+        }
+
+        .answer-option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .answer-option:hover {
+            background: #e0f7ff;
+            border-color: #4facfe;
+            transform: translateX(5px);
+        }
+
+        .answer-option.selected {
+            background: #4facfe;
+            color: white;
+            border-color: #4facfe;
+        }
+
+        .answer-option.correct {
+            background: #4caf50;
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .answer-option.incorrect {
+            background: #f44336;
+            color: white;
+            border-color: #f44336;
+        }
+
+        .answer-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .answer-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: white;
+            color: #4facfe;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .answer-option.selected .answer-label {
+            background: white;
+            color: #4facfe;
+        }
+
+        .answer-option.correct .answer-label {
+            background: white;
+            color: #4caf50;
+        }
+
+        .answer-option.incorrect .answer-label {
+            background: white;
+            color: #f44336;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 172, 254, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-summary {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            margin: 30px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .score-circle.excellent {
+            background: linear-gradient(135deg, #4caf50 0%, #8bc34a 100%);
+        }
+
+        .score-circle.good {
+            background: linear-gradient(135deg, #2196f3 0%, #03a9f4 100%);
+        }
+
+        .score-circle.average {
+            background: linear-gradient(135deg, #ff9800 0%, #ffc107 100%);
+        }
+
+        .score-circle.poor {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+
+        .result-message {
+            font-size: 24px;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎼 Harmonisch & Melodisch Moll</h1>
+        <p>Test: Modi, Skalen & Anwendung in der Jazz-Improvisation</p>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressBar"></div>
+    </div>
+
+    <div class="content">
+        <div class="start-screen active" id="startScreen">
+            <div class="start-info">
+                <h2>Willkommen zum Harmonisch-/Melodisch-Moll-Test!</h2>
+                <div class="info-box">
+                    <ul>
+                        <li><strong>📚 Themen:</strong> Harmonisch Moll, Melodisch Moll, Modi & Akkord-Skalen-Zuordnung</li>
+                        <li><strong>📝 Anzahl Fragen:</strong> 30 Multiple-Choice-Fragen</li>
+                        <li><strong>🎯 Level:</strong> Mittelstufe bis Fortgeschritten (Jazz/Improvisation)</li>
+                        <li><strong>💡 Lernmodus:</strong> Jede Frage mit ausführlicher Erklärung</li>
+                        <li><strong>⏱️ Zeit:</strong> Keine Zeitbegrenzung – ideal zum Üben mit Instrument</li>
+                    </ul>
+                </div>
+                <button class="btn btn-primary" onclick="startTest()">Test beginnen 🎹</button>
+            </div>
+        </div>
+
+        <div class="question-screen" id="questionScreen">
+            <div class="question-header">
+                <div class="question-number" id="questionNumber">Frage 1 von 30</div>
+                <div class="question-text" id="questionText"></div>
+            </div>
+
+            <div class="answers" id="answersContainer"></div>
+
+            <div class="explanation" id="explanation">
+                <h4>💡 Erklärung:</h4>
+                <p id="explanationText"></p>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="previousQuestion()" id="prevBtn" disabled>← Zurück</button>
+                <button class="btn btn-primary" onclick="checkAnswer()" id="checkBtn">Antwort prüfen</button>
+                <button class="btn btn-primary" onclick="nextQuestion()" id="nextBtn" style="display:none;">Weiter →</button>
+            </div>
+        </div>
+
+        <div class="result-screen" id="resultScreen">
+            <div class="result-summary">
+                <h2>Test abgeschlossen! 🎉</h2>
+                <div class="score-circle" id="scoreCircle">
+                    <span id="scorePercentage">0%</span>
+                </div>
+                <div class="result-message" id="resultMessage"></div>
+
+                <div class="result-details">
+                    <div class="result-item">
+                        <span><strong>Richtige Antworten:</strong></span>
+                        <span id="correctCount">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span><strong>Falsche Antworten:</strong></span>
+                        <span id="incorrectCount">0</span>
+                    </div>
+                    <div class="result-item">
+                        <span><strong>Gesamtpunktzahl:</strong></span>
+                        <span id="totalScore">0/30</span>
+                    </div>
+                    <div class="result-item">
+                        <span><strong>Prozentsatz:</strong></span>
+                        <span id="percentageScore">0%</span>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="restartTest()">Test wiederholen 🔄</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        {
+            type: 'multiple-choice',
+            question: 'Was ist der wichtigste Unterschied zwischen der natürlichen Moll-Tonleiter (Äolisch) und der harmonischen Moll-Tonleiter?',
+            options: [
+                'Die 7. Stufe ist in Harmonisch Moll erhöht (große Septime)',
+                'Die 3. Stufe ist in Harmonisch Moll erhöht',
+                'Harmonisch Moll hat weniger Töne',
+                'Es gibt keinen Unterschied'
+            ],
+            correct: 0,
+            explanation: 'Natürlich Moll (Äolisch) hat eine kleine Septime (♭7). In Harmonisch Moll wird die 7. Stufe erhöht (große Septime), um eine starke Leittonwirkung zur Tonika zu erzeugen. In A: A natürlich Moll = A-H-C-D-E-F-G-A, A harmonisch Moll = A-H-C-D-E-F-G#-A.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Was ist der wichtigste Unterschied zwischen Harmonisch Moll und Melodisch Moll (Jazz-Variante, auf- und abwärts gleich)?',
+            options: [
+                'In Melodisch Moll ist zusätzlich die 6. Stufe erhöht',
+                'In Melodisch Moll ist die 2. Stufe erniedrigt',
+                'Harmonisch Moll hat eine erhöhte 6. Stufe',
+                'Melodisch Moll ist identisch mit Dur'
+            ],
+            correct: 0,
+            explanation: 'Harmonisch Moll: 1-2-♭3-4-5-♭6-7. Melodisch Moll (Jazz): 1-2-♭3-4-5-6-7. Der Unterschied: in Melodisch Moll wird zur erhöhten 7 auch die 6. Stufe angehoben, was den Sprung ♭6–7 glättet und einen moderneren, weniger exotischen Klang ergibt.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Töne gehören zur Tonleiter A harmonisch Moll?',
+            options: [
+                'A – H – C – D – E – F – G# – A',
+                'A – H – C – D – E – F# – G – A',
+                'A – H – C – D – E – F# – G# – A',
+                'A – H – C – D – E♭ – F – G – A'
+            ],
+            correct: 0,
+            explanation: 'A harmonisch Moll: 1 (A), 2 (H), ♭3 (C), 4 (D), 5 (E), ♭6 (F), 7 (G#). Typisch ist der große Schritt F–G# (übermäßige Sekunde).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Töne gehören zur Tonleiter A melodisch Moll (Jazz-Variante, auf- und abwärts gleich)?',
+            options: [
+                'A – H – C – D – E – F# – G# – A',
+                'A – H – C – D – E – F – G# – A',
+                'A – H – C – D – E – F# – G – A',
+                'A – H – C – D – E♭ – F – G – A'
+            ],
+            correct: 0,
+            explanation: 'A melodisch Moll (Jazz): 1 (A), 2 (H), ♭3 (C), 4 (D), 5 (E), 6 (F#), 7 (G#). Also A-Dur mit kleiner Terz, oder: natürlich Moll, aber 6 und 7 erhöht.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welches Akkordsymbol beschreibt typischerweise den I. Stufenakkord in einer Melodisch-Moll-Tonleiter?',
+            options: [
+                'mMaj7 (Moll-Dreiklang mit großer Septime)',
+                'm7 (Moll7)',
+                'maj7 (Durmaj7)',
+                'm7♭5 (halbvermindert)'
+            ],
+            correct: 0,
+            explanation: 'Die 1. Stufe von Melodisch Moll ergibt einen Moll-Dreiklang mit großer Septime: z.B. A melodisch Moll → A–C–E–G#. Das wird als AmMaj7 notiert und ist ein typischer Jazz-Akkord.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala passt am direktesten über einen CmMaj7-Akkord?',
+            options: [
+                'C melodisch Moll',
+                'C harmonisch Moll',
+                'C natürlich Moll (Äolisch)',
+                'C-Dur (Ionisch)'
+            ],
+            correct: 0,
+            explanation: 'CmMaj7 = 1–♭3–5–7. Der passende Skalenkontext ist Melodisch Moll vom Grundton: C melodisch Moll = C–D–E♭–F–G–A–H. Die Skala enthält exakt die Akkordtöne C–E♭–G–H sowie typische Optionstöne.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Wie viele Modi (Kirchentonleiter-ähnliche Skalen) kann man aus einer einzelnen Melodisch-Moll-Tonleiter ableiten?',
+            options: [
+                '7',
+                '5',
+                '8',
+                '12'
+            ],
+            correct: 0,
+            explanation: 'Wie bei Dur und Harmonisch Moll entstehen auch aus Melodisch Moll 7 Modi, indem man auf jeder Stufe startet. Jeder Modus liefert einen anderen Akkord-/Skalen-Klang (z.B. Alteriert, Lydian Dominant usw.).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Wie heißt der 7. Modus der Melodisch-Moll-Tonleiter im Jazz-Sprachgebrauch?',
+            options: [
+                'Alterierte Skala (Super-Lokrisch)',
+                'Phrygisch Dominant',
+                'Lydian Dominant',
+                'Dorian ♭2'
+            ],
+            correct: 0,
+            explanation: 'Der 7. Modus von Melodisch Moll wird meist als „Alterierte Skala“ oder „Super-Lokrisch“ bezeichnet. Er enthält alle alterierten Spannungstöne einer Dominante: ♭9, #9, ♭5/#11, ♭13.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Melodisch-Moll-Tonleiter passt über einen G7alt-Akkord (G7 mit ♭9/#9/♭5/#5)?',
+            options: [
+                'A♭ melodisch Moll',
+                'G melodisch Moll',
+                'D melodisch Moll',
+                'C melodisch Moll'
+            ],
+            correct: 0,
+            explanation: 'Die Alterierte Skala liegt immer einen Halbton über dem Dominantgrundton. Für G7alt: A♭ melodisch Moll. 7. Modus von A♭ melodisch Moll = G alteriert.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Wie heißt der 4. Modus der Melodisch-Moll-Tonleiter?',
+            options: [
+                'Lydian Dominant (Lydisch ♭7)',
+                'Phrygisch Dominant',
+                'Ionisch ♯5',
+                'Lokrisch ♮2'
+            ],
+            correct: 0,
+            explanation: 'Der 4. Modus von Melodisch Moll heißt „Lydian Dominant“: eine lydische Skala mit kleiner Septime. Er eignet sich ideal für Dominant7#11-Akkorde.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Zu welchem Akkordtyp passt der Modus „Lydian Dominant“ am besten?',
+            options: [
+                'Dominant7#11',
+                'Maj7#11',
+                'Moll7♭5',
+                'MollMaj7'
+            ],
+            correct: 0,
+            explanation: 'Lydian Dominant enthält 1–2–3–#4–5–6–♭7. Die Kombination aus #11 und ♭7 entspricht einem Dominant7#11-Akkord (z.B. G7#11).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Melodisch-Moll-Tonleiter verwendest du, um über G7#11 im Kontext von C-Dur zu spielen (z.B. G7 als V von C)?',
+            options: [
+                'D melodisch Moll',
+                'G melodisch Moll',
+                'C melodisch Moll',
+                'A melodisch Moll'
+            ],
+            correct: 0,
+            explanation: 'Für G7#11 verwendest du Lydian Dominant von G. Das ist der 4. Modus von D melodisch Moll. Also: G Lydian Dominant = Töne aus D melodisch Moll, beginnend auf G.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Wie heißt der 5. Modus der Harmonisch-Moll-Tonleiter?',
+            options: [
+                'Phrygisch Dominant',
+                'Lokrisch ♮2',
+                'Lydian Dominant',
+                'Alteriert'
+            ],
+            correct: 0,
+            explanation: 'Der 5. Modus von Harmonisch Moll heißt „Phrygisch Dominant“: phrygischer Charakter (♭2, ♭6) mit großer Terz und kleiner Septime. Typisch für V7 in Mollkadenz (z.B. E-Phrygisch-Dominant über E7 in A-Moll).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Töne hat E-Phrygisch-Dominant, wenn er aus A harmonisch Moll abgeleitet wird?',
+            options: [
+                'E – F – G# – A – H – C – D – E',
+                'E – F# – G# – A – H – C – D – E',
+                'E – F – G – A – H – C – D – E',
+                'E – F – G# – A – H – C# – D – E'
+            ],
+            correct: 0,
+            explanation: 'A harmonisch Moll = A–H–C–D–E–F–G#. Von der 5. Stufe (E) aus: E–F–G#–A–H–C–D–E. Das ist E-Phrygisch-Dominant: ♭2 (F), große Terz (G#), ♭6 (C), ♭7 (D).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Zu welchem Akkordtyp passt Phrygisch Dominant am besten?',
+            options: [
+                'Dominant7(b9, b13)',
+                'Maj7#11',
+                'MollMaj7',
+                'Moll7♭5'
+            ],
+            correct: 0,
+            explanation: 'Phrygisch Dominant enthält 1–♭2–3–4–5–♭6–♭7. Das entspricht einem Dominant7-Akkord (1–3–5–♭7) plus ♭9 (♭2) und ♭13 (♭6). Typisch: V7(b9, b13) in Moll.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala nutzt du typischerweise über einen IIø7–V7(b9)–Imaj7 in Moll (z.B. Bm7♭5 – E7(b9) – AmMaj7)?',
+            options: [
+                'Alles aus A melodisch Moll',
+                'Alles aus A-Dur',
+                'Alles aus A natürlich Moll',
+                'Alles aus A harmonisch Moll'
+            ],
+            correct: 3,
+            explanation: 'Die klassische Mollkadenz wird aus Harmonisch Moll abgeleitet: in A harmonisch Moll liegen Bm7♭5 (IIø7), E7(b9) (V7(b9)) und AmMaj7 (I) nahe. Im Jazz kombiniert man oft Harmonisch und Melodisch Moll, aber die reine Funktionsableitung kommt aus Harmonisch Moll.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welcher Modus der Melodisch-Moll-Tonleiter heißt „Dorian ♭2“?',
+            options: [
+                '2. Modus',
+                '3. Modus',
+                '5. Modus',
+                '6. Modus'
+            ],
+            correct: 0,
+            explanation: 'Der 2. Modus von Melodisch Moll heißt „Dorian ♭2“: 1–♭2–♭3–4–5–6–♭7. Er klingt wie Dorisch, aber mit kleiner Sekunde und eignet sich für Moll-Akkorde mit ♭9 im Kontext von Melodisch Moll.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala eignet sich im Jazz häufig über einen m7♭5-Akkord mit natürlicher 9 (z.B. Bm7♭5 mit C# als 9)?',
+            options: [
+                'Der 6. Modus von Melodisch Moll (Lokrisch ♮2)',
+                'Natürlich Moll',
+                'Dur-Pentatonik',
+                'Blues-Skala'
+            ],
+            correct: 0,
+            explanation: 'Über m7♭5-Akkorde mit natürlicher 9 verwendet man oft den 6. Modus von Melodisch Moll: „Lokrisch ♮2“. Beispiel: Bm7♭5 mit C# als 9 → D melodisch Moll (6. Modus von D melodisch Moll beginnt auf B).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Intervallstruktur hat die Melodisch-Moll-Tonleiter vom Grundton aus betrachtet?',
+            options: [
+                'Ganz – Halb – Ganz – Ganz – Ganz – Ganz – Halb (Dur mit ♭3)',
+                'Ganz – Halb – Ganz – Ganz – Halb – Ganz – Ganz',
+                'Halb – Ganz – Ganz – Halb – Ganz – Ganz – Ganz',
+                'Ganz – Ganz – Halb – Ganz – Ganz – Halb – Ganz'
+            ],
+            correct: 0,
+            explanation: 'Melodisch Moll kann man als Dur mit kleiner Terz sehen: Intervalle: 1–2–♭3–4–5–6–7. In Halbtonschritten: Ganz, Halb, Ganz, Ganz, Ganz, Ganz, Halb.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Intervallstruktur hat die Harmonisch-Moll-Tonleiter vom Grundton aus betrachtet?',
+            options: [
+                'Ganz – Halb – Ganz – Ganz – Halb – eineinhalb – Halb',
+                'Ganz – Ganz – Halb – Ganz – Ganz – Ganz – Halb',
+                'Ganz – Halb – Ganz – Halb – Ganz – Ganz – Ganz',
+                'Halb – Ganz – Ganz – Ganz – Halb – Ganz – Ganz'
+            ],
+            correct: 0,
+            explanation: 'Harmonisch Moll: 1–2–♭3–4–5–♭6–7. Die charakteristische übermäßige Sekunde zwischen ♭6 und 7 entspricht drei Halbtönen (eineinhalb Ganztonschritte).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala würdest du bevorzugt über einen AmMaj7-Akkord in einer modalen Ballade verwenden?',
+            options: [
+                'A melodisch Moll',
+                'A natürlich Moll',
+                'A harmonisch Moll',
+                'C-Dur'
+            ],
+            correct: 0,
+            explanation: 'AmMaj7 ist die I. Stufe von A melodisch Moll. Die naheliegendste Skala ist daher A melodisch Moll, was einen modernen, leicht „schwebenden“ Moll-Klang erzeugt.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Du hast eine IIø7–V7alt–ImMaj7-Kadenz in Moll (z.B. Bm7♭5 – E7alt – AmMaj7). Welche Kombination ist eine übliche moderne Jazz-Lösung?',
+            options: [
+                'Bm7♭5: Lokrisch ♮2, E7alt: Alteriert, AmMaj7: Melodisch Moll',
+                'Bm7♭5: natürlich Moll, E7alt: Dur, AmMaj7: natürlich Moll',
+                'Alle drei: natürlich Moll',
+                'Alle drei: Harmonisch Moll'
+            ],
+            correct: 0,
+            explanation: 'Eine gängige moderne Jazz-Kombination: IIø7 mit Lokrisch ♮2 (6. Modus Melodisch Moll), V7alt mit Alterierter Skala (7. Modus Melodisch Moll einen Halbton höher) und I mMaj7 mit Melodisch Moll vom Grundton. So nutzt man konsequent Melodisch-Moll-Material.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala eignet sich am besten, um einen länger stehenden Dominant7(b9,b13)-Akkord mit „orientalischem“/spanischem Klang zu improvisieren?',
+            options: [
+                'Phrygisch Dominant (5. Modus Harmonisch Moll)',
+                'Mixolydisch',
+                'Ionisch',
+                'Natürlich Moll'
+            ],
+            correct: 0,
+            explanation: 'Der phrygisch-dominante Modus (5. Modus von Harmonisch Moll) hat die typische Kombination ♭2, 3, ♭6 und ♭7 und wird oft mit „spanisch“, „orientalisch“ assoziiert, z.B. über E7(b9,b13).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala passt gut über einen Akkord-Typ „maj7#5“ (z.B. Cmaj7#5)?',
+            options: [
+                'Der 3. Modus von Harmonisch Moll (Ionisch #5)',
+                'Der 4. Modus von Melodisch Moll (Lydian Dominant)',
+                'Der 7. Modus von Melodisch Moll (Alteriert)',
+                'Natürlich Moll'
+            ],
+            correct: 0,
+            explanation: 'Der 3. Modus von Harmonisch Moll heißt oft „Ionisch #5“ und liefert die Spannung #5 über einem maj7-Akkord. Beispiel: Cmaj7#5 → C-Ionisch-#5 aus A♭ harmonisch Moll.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Du spielst über einen G7(b9,13) im Kontext von C-Moll. Welche skalenbasierte Wahl ist funktional sinnvoll?',
+            options: [
+                'G-Phrygisch-Dominant aus C harmonisch Moll',
+                'G-Mixolydisch aus C-Dur',
+                'G-Dorisch aus F-Dur',
+                'G-Lydisch aus D-Dur'
+            ],
+            correct: 0,
+            explanation: 'In C harmonisch Moll ist die 5. Stufe G-Phrygisch-Dominant. Diese Skala enthält ♭9 und häufig ♭13, passt also ideal zum G7(b9,13) als Dominante in C-Moll.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welcher Modus von Melodisch Moll ist besonders geeignet für einen „halbverminderten“ Akkord (m7♭5) ohne natürliche 9, z.B. Bm7♭5 mit C als 9?',
+            options: [
+                'Lokrisch (7. Modus von Dur) oder 2. Modus von Harmonisch Moll',
+                'Ionisch',
+                'Lydian Dominant',
+                'Mixolydisch ♭6'
+            ],
+            correct: 0,
+            explanation: 'Klassisch nutzt man Lokrisch aus Dur (7. Modus) für m7♭5, eventuell auch den 2. Modus von Harmonisch Moll. Will man eine natürliche 9, greift man aber zu Lokrisch ♮2 (6. Modus Melodisch Moll).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Aussage zur Anwendung von Melodisch Moll in der Improvisation ist am treffendsten?',
+            options: [
+                'Melodisch Moll liefert eine Familie von Skalen, die viele typische Jazz-Akkorde direkt abdecken',
+                'Melodisch Moll wird nur in klassischer Musik verwendet',
+                'Melodisch Moll ersetzt die Dur-Tonleiter vollständig',
+                'Melodisch Moll ist nur für Outside-Playing geeignet'
+            ],
+            correct: 0,
+            explanation: 'Melodisch Moll ist im modernen Jazz extrem wichtig, weil ihre Modi direkt mit vielen Akkordtypen verknüpft sind: mMaj7, m7♭5 mit ♮9, Dominant7#11, Dominant7alt usw.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Aussage zur Kombination von Harmonisch Moll und Melodisch Moll in Moll-Tonarten trifft am ehesten zu?',
+            options: [
+                'Beide Tonleitern werden oft gemischt: Harmonisch Moll für klassische Funktionsdominanten, Melodisch Moll für moderne Klangfarben',
+                'Man darf nie beide verwenden',
+                'Nur Harmonisch Moll ist theoretisch korrekt',
+                'Nur Melodisch Moll ist im Jazz erlaubt'
+            ],
+            correct: 0,
+            explanation: 'In der Praxis mischt man beide: Harmonisch Moll liefert die klare Funktionsdominante (V7(b9) in Moll), Melodisch Moll erweitert das Vokabular um moderne Modi (Alteriert, Lydian Dominant, mMaj7 usw.).'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Welche Skala eignet sich am besten, um über einen länger stehenden Akkord GmMaj7 in einer modalen Umgebung zu improvisieren?',
+            options: [
+                'G melodisch Moll',
+                'G natürlich Moll',
+                'G harmonisch Moll',
+                'C-Dur'
+            ],
+            correct: 0,
+            explanation: 'GmMaj7 ist die 1. Stufe von G melodisch Moll. Daher ist G melodisch Moll die logischste und reichhaltigste Skalenwahl für einen modalen Sound.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Du möchtest über einen C7alt-Akkord in einer Turnaround-Progression möglichst viel Spannung erzeugen. Welche Skala wählst du?',
+            options: [
+                'Alterierte Skala (7. Modus von Des melodisch Moll)',
+                'C-Mixolydisch',
+                'C-Dur',
+                'C natürlich Moll'
+            ],
+            correct: 0,
+            explanation: 'Für C7alt nimmst du die Alterierte Skala: 7. Modus von Des melodisch Moll. Sie enthält alle alterierten Optionen (♭9, #9, ♭5/#11, ♭13) und maximiert die Spannung vor der Auflösung.'
+        },
+        {
+            type: 'multiple-choice',
+            question: 'Wie kannst du deinen Schülern die Verbindung „A harmonisch Moll“ und „E7(b9)“ praktisch verdeutlichen?',
+            options: [
+                'E7(b9) als V in A-Moll erklären und zeigen, dass alle Töne von E7(b9) in A harmonisch Moll vorkommen',
+                'E7(b9) als V in C-Dur erklären',
+                'Nur die Pentatonik spielen lassen',
+                'Den Zusammenhang ignorieren'
+            ],
+            correct: 0,
+            explanation: 'E7(b9) ist die Dominante zu A-Moll. A harmonisch Moll liefert genau das Material für E7(b9): die große Leitton G# und die ♭9 (F). So wird die Funktionalität von Harmonisch Moll im Kadenzieren klar hörbar.'
+        }
+    ];
+
+    // NEU: Optionen pro Frage zufällig mischen und korrekten Index anpassen
+    function shuffleQuestionOptions(question) {
+        const indices = question.options.map((_, i) => i);
+
+        // Fisher-Yates-Shuffle
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+
+        const newOptions = [];
+        let newCorrectIndex = 0;
+
+        indices.forEach((oldIndex, newIndex) => {
+            newOptions[newIndex] = question.options[oldIndex];
+            if (oldIndex === question.correct) {
+                newCorrectIndex = newIndex;
+            }
+        });
+
+        question.options = newOptions;
+        question.correct = newCorrectIndex;
+    }
+
+    // Alle Fragen einmal beim Laden mischen
+    questions.forEach(shuffleQuestionOptions);
+
+    let currentQuestion = 0;
+    let score = 0;
+    let userAnswers = [];
+    let answerChecked = false;
+
+    function startTest() {
+        document.getElementById('startScreen').classList.remove('active');
+        document.getElementById('questionScreen').classList.add('active');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQuestion];
+        document.getElementById('questionNumber').textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+        document.getElementById('questionText').textContent = q.question;
+
+        const answersContainer = document.getElementById('answersContainer');
+        answersContainer.innerHTML = '';
+
+        q.options.forEach((option, index) => {
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'answer-option';
+            answerDiv.onclick = () => selectAnswer(index);
+            answerDiv.innerHTML = `
+                <span class="answer-label">${String.fromCharCode(65 + index)}</span>
+                <span>${option}</span>
+            `;
+            answersContainer.appendChild(answerDiv);
+        });
+
+        document.getElementById('explanation').classList.remove('show');
+        document.getElementById('checkBtn').style.display = 'block';
+        document.getElementById('nextBtn').style.display = 'none';
+        document.getElementById('prevBtn').disabled = currentQuestion === 0;
+
+        answerChecked = false;
+        updateProgressBar();
+    }
+
+    function selectAnswer(index) {
+        if (answerChecked) return;
+
+        const options = document.querySelectorAll('.answer-option');
+        options.forEach(opt => opt.classList.remove('selected'));
+        options[index].classList.add('selected');
+        userAnswers[currentQuestion] = index;
+    }
+
+    function checkAnswer() {
+        if (userAnswers[currentQuestion] === undefined) {
+            alert('Bitte wählen Sie eine Antwort aus!');
+            return;
+        }
+
+        answerChecked = true;
+        const q = questions[currentQuestion];
+        const options = document.querySelectorAll('.answer-option');
+
+        options.forEach((opt, index) => {
+            opt.classList.add('disabled');
+            if (index === q.correct) {
+                opt.classList.add('correct');
+            }
+            if (index === userAnswers[currentQuestion] && index !== q.correct) {
+                opt.classList.add('incorrect');
+            }
+        });
+
+        if (userAnswers[currentQuestion] === q.correct) {
+            score++;
+        }
+
+        document.getElementById('explanationText').textContent = q.explanation;
+        document.getElementById('explanation').classList.add('show');
+        document.getElementById('checkBtn').style.display = 'none';
+        document.getElementById('nextBtn').style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuestion++;
+        if (currentQuestion < questions.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function previousQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            loadQuestion();
+
+            if (userAnswers[currentQuestion] !== undefined) {
+                const options = document.querySelectorAll('.answer-option');
+                options[userAnswers[currentQuestion]].classList.add('selected');
+            }
+        }
+    }
+
+    function updateProgressBar() {
+        const progress = ((currentQuestion + 1) / questions.length) * 100;
+        document.getElementById('progressBar').style.width = progress + '%';
+    }
+
+    function showResults() {
+        document.getElementById('questionScreen').classList.remove('active');
+        document.getElementById('resultScreen').classList.add('active');
+
+        const percentage = Math.round((score / questions.length) * 100);
+        const scoreCircle = document.getElementById('scoreCircle');
+
+        document.getElementById('scorePercentage').textContent = percentage + '%';
+        document.getElementById('correctCount').textContent = score;
+        document.getElementById('incorrectCount').textContent = questions.length - score;
+        document.getElementById('totalScore').textContent = `${score}/${questions.length}`;
+        document.getElementById('percentageScore').textContent = percentage + '%';
+
+        let message = '';
+        let circleClass = '';
+
+        if (percentage >= 90) {
+            message = '🎉 Exzellent! Dein Wissen über Harmonisch/Melodisch Moll ist top!';
+            circleClass = 'excellent';
+        } else if (percentage >= 75) {
+            message = '👏 Sehr gut! Du hast die wichtigsten Modi und Anwendungen verstanden!';
+            circleClass = 'good';
+        } else if (percentage >= 60) {
+            message = '👍 Solide! Wiederhole ein paar Modi und Akkord-Skalen-Zuordnungen.';
+            circleClass = 'average';
+        } else {
+            message = '📚 Weiter üben! Spiele die Skalen über echte II–V–I-Kadenzen in Moll.';
+            circleClass = 'poor';
+        }
+
+        document.getElementById('resultMessage').textContent = message;
+        scoreCircle.className = 'score-circle ' + circleClass;
+
+        updateProgressBar();
+    }
+
+    function restartTest() {
+        currentQuestion = 0;
+        score = 0;
+        userAnswers = [];
+        answerChecked = false;
+
+        document.getElementById('resultScreen').classList.remove('active');
+        document.getElementById('startScreen').classList.add('active');
+        document.getElementById('progressBar').style.width = '0%';
+    }
+</script>
+</body>
+</html>
