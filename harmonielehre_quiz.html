@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmonielehre Quiz - Jazz/Rock/Pop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.4em;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #e3e8ff;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .option-letter {
+            background: #667eea;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option.correct .option-letter {
+            background: #28a745;
+        }
+
+        .option.incorrect .option-letter {
+            background: #dc3545;
+        }
+
+        .option-text {
+            flex: 1;
+            font-size: 1.1em;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .result-container {
+            text-align: center;
+            display: none;
+        }
+
+        .result-container.active {
+            display: block;
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 30px auto;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .score-circle .score {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .score-circle .total {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .result-message {
+            font-size: 1.5em;
+            color: #333;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-details p {
+            margin: 10px 0;
+            font-size: 1.1em;
+            color: #555;
+        }
+
+        .explanation {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .explanation p {
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .question {
+                font-size: 1.2em;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Harmonielehre Quiz</h1>
+            <p>Jazz, Rock & Pop Harmonieverbindungen</p>
+        </div>
+
+        <div id="quiz-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+
+            <div class="question-info">
+                <span id="question-number">Frage 1 von 30</span>
+                <span id="score-display">Punkte: 0/0</span>
+            </div>
+
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="explanation" id="explanation"></div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn btn-primary" id="check-btn" disabled>Antwort überprüfen</button>
+                <button class="btn btn-primary" id="next-btn" style="display: none;">Nächste Frage</button>
+            </div>
+        </div>
+
+        <div class="result-container" id="result-container">
+            <h2>Quiz beendet!</h2>
+            <div class="score-circle">
+                <div class="score" id="final-score">0</div>
+                <div class="total">von 30</div>
+            </div>
+            <div class="result-message" id="result-message"></div>
+            <div class="result-details">
+                <p>Richtige Antworten: <strong id="correct-count">0</strong></p>
+                <p>Falsche Antworten: <strong id="incorrect-count">0</strong></p>
+                <p>Erfolgsquote: <strong id="percentage">0%</strong></p>
+            </div>
+            <button class="btn btn-primary" onclick="location.reload()">Quiz neu starten</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "Welche Akkordfolge ist die häufigste in der Pop-Musik?",
+                options: ["I - IV - V - I", "I - VI - IV - V", "II - V - I", "I - III - VI - IV"],
+                correct: 1,
+                explanation: "Die I-VI-IV-V Progression (z.B. C-Am-F-G) ist eine der beliebtesten Akkordfolgen in der Pop-Musik und wird in unzähligen Songs verwendet."
+            },
+            {
+                question: "Was ist eine II-V-I Verbindung?",
+                options: ["Eine Blues-Progression", "Eine Jazz-Kadenz", "Eine Rockballade", "Eine Moll-Tonleiter"],
+                correct: 1,
+                explanation: "Die II-V-I ist die fundamentale Kadenz im Jazz. In C-Dur wäre das Dm7 - G7 - Cmaj7."
+            },
+            {
+                question: "Welche Funktion hat der Dominant-Septakkord?",
+                options: ["Stabil und beruhigend", "Spannungsaufbau zur Tonika", "Neutrale Durchgangsfunktion", "Melodische Verzierung"],
+                correct: 1,
+                explanation: "Der Dominant-Septakkord (V7) erzeugt Spannung, die zur Auflösung in die Tonika (I) drängt."
+            },
+            {
+                question: "Was bedeutet 'Axis Progression' im Pop?",
+                options: ["I - V - VI - IV", "I - IV - I - V", "VI - IV - I - V", "IV - I - V - VI"],
+                correct: 0,
+                explanation: "Die Axis Progression I-V-VI-IV (z.B. C-G-Am-F) ist extrem populär und wird in Songs wie 'Let it Be' oder 'No Woman No Cry' verwendet."
+            },
+            {
+                question: "Welcher Akkord wird häufig als Ersatz für die Dominante verwendet?",
+                options: ["Subdominante", "Tritonus-Substitution", "Mediante", "Tonika-Parallele"],
+                correct: 1,
+                explanation: "Die Tritonus-Substitution ersetzt die Dominante durch einen Akkord eine übermäßige Quarte entfernt (z.B. Db7 statt G7 in C-Dur)."
+            },
+            {
+                question: "Was ist die '50s Progression'?",
+                options: ["I - VI - IV - V", "I - IV - V - IV", "I - V - VI - IV", "VI - IV - I - V"],
+                correct: 0,
+                explanation: "Die I-VI-IV-V (z.B. C-Am-F-G) war in den 1950er Jahren extrem populär, daher der Name '50s Progression' oder 'Doo-Wop Changes'."
+            },
+            {
+                question: "Welche Funktion hat die Subdominante (IV)?",
+                options: ["Auflösung", "Spannung", "Vorbereitung der Dominante", "Modulationspunkt"],
+                correct: 2,
+                explanation: "Die Subdominante bereitet typischerweise die Dominante vor und bewegt sich weg von der Tonika."
+            },
+            {
+                question: "Was ist ein 'Turnaround' im Jazz?",
+                options: ["Ein Ritardando", "Eine Schlussakkordfolge", "Eine Überleitung zum Anfang", "Ein Tempo-Wechsel"],
+                correct: 2,
+                explanation: "Ein Turnaround ist eine kurze Akkordfolge (oft I-VI-II-V), die zurück zum Anfang eines Songformulars führt."
+            },
+            {
+                question: "Welche Progression ist typisch für den Blues?",
+                options: ["I - IV - V über 12 Takte", "I - VI - II - V", "I - III - VI - IV", "II - V - I"],
+                correct: 0,
+                explanation: "Die 12-Takt-Blues-Form basiert hauptsächlich auf I, IV und V (z.B. C7-F7-G7 in C-Blues)."
+            },
+            {
+                question: "Was ist eine 'Modal Interchange'?",
+                options: ["Tempowechsel", "Akkorde aus paralleler Tonart", "Rhythmuswechsel", "Melodietransposition"],
+                correct: 1,
+                explanation: "Modal Interchange bedeutet, Akkorde aus der parallelen Moll- oder Dur-Tonart zu verwenden (z.B. Fm in C-Dur)."
+            },
+            {
+                question: "Welche Akkordfolge wird 'Andalusische Kadenz' genannt?",
+                options: ["I - bVII - bVI - V", "I - IV - V - I", "I - VI - IV - V", "IV - I - V - I"],
+                correct: 0,
+                explanation: "Die Andalusische Kadenz (I-bVII-bVI-V, z.B. Am-G-F-E) stammt aus der spanischen Musik und ist in Rock und Metal sehr beliebt."
+            },
+            {
+                question: "Was ist die 'Circle of Fifths Progression'?",
+                options: ["Zufällige Akkordfolge", "Akkorde in Quintabständen", "Nur Dur-Akkorde", "Nur Moll-Akkorde"],
+                correct: 1,
+                explanation: "Akkorde bewegen sich in Quintschritten abwärts (z.B. C-F-Bb-Eb), eine kraftvolle harmonische Bewegung."
+            },
+            {
+                question: "Welcher Akkord wird oft als VI in Dur verwendet?",
+                options: ["Moll-Akkord (Moll-Parallele)", "Dur-Akkord", "Verminderter Akkord", "Übermäßiger Akkord"],
+                correct: 0,
+                explanation: "Die VI Stufe in Dur ist typischerweise ein Moll-Akkord (z.B. Am in C-Dur) und wird als Tonika-Parallele bezeichnet."
+            },
+            {
+                question: "Was ist ein 'Deceptive Cadence'?",
+                options: ["V - I", "V - VI", "IV - I", "II - V"],
+                correct: 1,
+                explanation: "Die Trugschluss-Kadenz (V-VI, z.B. G-Am in C-Dur) täuscht eine Auflösung zur Tonika vor, geht aber zur VI."
+            },
+            {
+                question: "Welche Progression ist typisch für viele Beatles-Songs?",
+                options: ["I - bVII - IV", "I - V - VI - IV", "I - IV - V - IV", "Alle genannten"],
+                correct: 3,
+                explanation: "Die Beatles verwendeten verschiedene Progressionen innovativ, einschließlich der bVII (aus Modal Interchange) und klassische Pop-Progressionen."
+            },
+            {
+                question: "Was bedeutet 'Backdoor Progression'?",
+                options: ["bVII - IV - I", "V - I", "II - V - I", "IV - V - I"],
+                correct: 0,
+                explanation: "Die Backdoor Progression (bVII-IV-I, z.B. Bb-F-C) ist eine alternative Auflösung zur Tonika, populär im Jazz."
+            },
+            {
+                question: "Welcher Akkord ist die Dominante in C-Dur?",
+                options: ["F", "G", "Am", "Dm"],
+                correct: 1,
+                explanation: "Die V Stufe (Dominante) in C-Dur ist G, oft als G7 mit Septime gespielt."
+            },
+            {
+                question: "Was ist eine 'Plagale Kadenz'?",
+                options: ["V - I", "IV - I", "II - I", "VI - I"],
+                correct: 1,
+                explanation: "Die plagale Kadenz IV-I (z.B. F-C) wird auch 'Amen-Kadenz' genannt, da sie oft in Kirchenmusik verwendet wird."
+            },
+            {
+                question: "Welche Akkordfolge nennt man 'Royal Road Progression' (Japan)?",
+                options: ["IV - V - III - VI", "I - V - VI - III - IV - I - IV - V", "I - IV - V - I", "VI - IV - V - I"],
+                correct: 1,
+                explanation: "Die 'Royal Road' (I-V-VI-III-IV-I-IV-V) ist in japanischer Popmusik extrem populär."
+            },
+            {
+                question: "Was ist ein 'Chromatic Mediant'?",
+                options: ["Halbtonschritt", "Akkord mit gemeinsamen Tönen, aber fremder Tonart", "Septakkord", "Mollakkord"],
+                correct: 1,
+                explanation: "Chromatische Mediante sind Akkorde im Terzabstand mit gemeinsamen Tönen (z.B. C-Dur zu E-Dur oder Ab-Dur)."
+            },
+            {
+                question: "Welche Progression ist typisch für Motown-Songs?",
+                options: ["I - II - III - IV", "I - bIII - IV - V", "I - IV - I - V", "VI - IV - I - V"],
+                correct: 1,
+                explanation: "Motown nutzte oft die I-bIII-IV-V Progression mit charakteristischem Groove."
+            },
+            {
+                question: "Was ist die 'Sensitive Female Chord Progression'?",
+                options: ["VI - IV - I - V", "I - V - VI - IV", "I - III - IV - IV", "II - V - I"],
+                correct: 0,
+                explanation: "Die VI-IV-I-V (z.B. Am-F-C-G) wird oft in emotionalen Pop-Songs verwendet."
+            },
+            {
+                question: "Welche Funktion hat ein Sus4-Akkord?",
+                options: ["Spannung und Verzögerung", "Schlussakkord", "Modulationspunkt", "Basis-Harmonie"],
+                correct: 0,
+                explanation: "Der Sus4-Akkord (z.B. Csus4) erzeugt Spannung durch Verzögerung der Terz und löst sich typischerweise zum Dur- oder Moll-Akkord auf."
+            },
+            {
+                question: "Was ist ein 'Secondary Dominant'?",
+                options: ["V von V", "IV von I", "II von VI", "Alle genannten"],
+                correct: 3,
+                explanation: "Sekundärdominanten sind Dominanten zu Akkorden außer der Tonika (z.B. D7 als V/V in C-Dur führt zu G)."
+            },
+            {
+                question: "Welche Progression verwendet 'Wonderwall' von Oasis?",
+                options: ["I - V - VI - IV", "Em7 - G - Dsus4 - A7sus4", "I - IV - V - I", "VI - IV - I - V"],
+                correct: 1,
+                explanation: "Wonderwall nutzt die Progression Em7-G-Dsus4-A7sus4, eine Variation der populären Axis-Progression."
+            },
+            {
+                question: "Was ist die 'Mixolydian Vamp'?",
+                options: ["I - bVII", "I - V", "I - IV", "V - IV"],
+                correct: 0,
+                explanation: "Die Mixolydian Vamp (I-bVII, z.B. C-Bb) nutzt die abgeflachte Septime und ist typisch für Rock und Folk."
+            },
+            {
+                question: "Welche Akkordfolge ist typisch für lateinamerikanische Musik?",
+                options: ["I - IV - V", "Im - IV - V", "Im - bVII - bVI - V", "I - bIII - IV"],
+                correct: 2,
+                explanation: "Die Im-bVII-bVI-V Progression ist charakteristisch für lateinamerikanische und spanische Musik."
+            },
+            {
+                question: "Was bedeutet 'I - IV - bVII - IV' im Rock?",
+                options: ["Blues-Schema", "Mixolydische Rock-Progression", "Jazz-Turnaround", "Klassische Kadenz"],
+                correct: 1,
+                explanation: "Diese Progression (z.B. C-F-Bb-F) nutzt die mixolydische Tonleiter und ist im Rock sehr verbreitet."
+            },
+            {
+                question: "Welche Funktion hat die Mediante (III) in Moll?",
+                options: ["Relative Dur-Tonart", "Dominante", "Subdominante", "Durchgang"],
+                correct: 0,
+                explanation: "Die III Stufe in Moll ist die relative Dur-Tonart (z.B. C-Dur ist die III von A-Moll)."
+            },
+            {
+                question: "Was ist die 'Diatonic Cycle'?",
+                options: ["Alle 7 Akkorde einer Tonleiter", "Nur Dur-Akkorde", "12-Takt-Blues", "Quintenzirkel"],
+                correct: 0,
+                explanation: "Der diatonische Zyklus durchläuft alle sieben Stufen einer diatonischen Tonleiter (z.B. C-Dm-Em-F-G-Am-Bdim-C)."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answered = false;
+
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const checkBtn = document.getElementById('check-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressEl = document.getElementById('progress');
+        const questionNumberEl = document.getElementById('question-number');
+        const scoreDisplayEl = document.getElementById('score-display');
+        const explanationEl = document.getElementById('explanation');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+
+        function loadQuestion() {
+            const question = questions[currentQuestion];
+            questionEl.textContent = question.question;
+            optionsEl.innerHTML = '';
+            explanationEl.classList.remove('show');
+            answered = false;
+            selectedAnswer = null;
+            checkBtn.disabled = true;
+            checkBtn.style.display = 'block';
+            nextBtn.style.display = 'none';
+
+            const letters = ['A', 'B', 'C', 'D'];
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = `
+                    <div class="option-letter">${letters[index]}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                optionDiv.onclick = () => selectOption(index);
+                optionsEl.appendChild(optionDiv);
+            });
+
+            updateProgress();
+        }
+
+        function selectOption(index) {
+            if (answered) return;
+
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            document.querySelectorAll('.option')[index].classList.add('selected');
+            selectedAnswer = index;
+            checkBtn.disabled = false;
+        }
+
+        function checkAnswer() {
+            if (selectedAnswer === null || answered) return;
+
+            answered = true;
+            const question = questions[currentQuestion];
+            const options = document.querySelectorAll('.option');
+
+            options.forEach((option, index) => {
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedAnswer && index !== question.correct) {
+                    option.classList.add('incorrect');
+                }
+                option.style.cursor = 'default';
+            });
+
+            if (selectedAnswer === question.correct) {
+                score++;
+            }
+
+            // Show explanation
+            explanationEl.innerHTML = `
+                <h4>Erklärung:</h4>
+                <p>${question.explanation}</p>
+            `;
+            explanationEl.classList.add('show');
+
+            checkBtn.style.display = 'none';
+            nextBtn.style.display = 'block';
+            updateProgress();
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressEl.style.width = progress + '%';
+            questionNumberEl.textContent = `Frage ${currentQuestion + 1} von ${questions.length}`;
+            scoreDisplayEl.textContent = `Punkte: ${score}/${currentQuestion + (answered ? 1 : 0)}`;
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultContainer.classList.add('active');
+
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('incorrect-count').textContent = questions.length - score;
+            document.getElementById('percentage').textContent = percentage + '%';
+
+            let message = '';
+            if (percentage >= 90) {
+                message = '🎉 Ausgezeichnet! Du bist ein Harmonielehre-Experte!';
+            } else if (percentage >= 75) {
+                message = '👏 Sehr gut! Du hast ein solides Verständnis!';
+            } else if (percentage >= 60) {
+                message = '👍 Gut gemacht! Es gibt noch Raum für Verbesserung.';
+            } else if (percentage >= 40) {
+                message = '📚 Nicht schlecht, aber mehr Übung wäre hilfreich.';
+            } else {
+                message = '💪 Weiter üben! Die Grundlagen brauchen noch Arbeit.';
+            }
+
+            document.getElementById('result-message').textContent = message;
+        }
+
+        checkBtn.onclick = checkAnswer;
+        nextBtn.onclick = nextQuestion;
+
+        // Initialize
+        loadQuestion();
+    </script>
+</body>
+</html>
