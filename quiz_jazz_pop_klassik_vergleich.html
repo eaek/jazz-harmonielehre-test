@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jazz/Pop vs. Klassik - Detaillierter Vergleich</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 950px;
+            width: 100%;
+            padding: 45px;
+        }
+
+        h1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.4em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 35px;
+            font-size: 1.15em;
+            font-weight: 500;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 8px;
+        }
+
+        .info-box p {
+            color: #444;
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .quiz-info {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .category-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+            color: white;
+        }
+
+        .cat-unterschied {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .cat-gemeinsamkeit {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .cat-nuance {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .cat-technik {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .cat-praxis {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            color: #333;
+        }
+
+        .cat-geschichte {
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            color: #333;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: #e0e0e0;
+            border-radius: 6px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question {
+            font-size: 1.3em;
+            color: #222;
+            margin-bottom: 25px;
+            font-weight: 600;
+            line-height: 1.7;
+        }
+
+        .question-context {
+            font-size: 0.95em;
+            color: #555;
+            font-style: italic;
+            margin-top: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-left: 3px solid #667eea;
+            border-radius: 5px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 18px 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.05em;
+            line-height: 1.6;
+        }
+
+        .option:hover {
+            background: #e8eeff;
+            border-color: #667eea;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+
+        .option.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+            color: white;
+            border-color: #4caf50;
+        }
+
+        .option.incorrect {
+            background: linear-gradient(135deg, #f44336 0%, #e53935 100%);
+            color: white;
+            border-color: #f44336;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px 32px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-next:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-container {
+            text-align: center;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .score {
+            font-size: 4.5em;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+            margin: 30px 0;
+        }
+
+        .result-message {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+
+        .result-details {
+            background: #f8f9fa;
+            padding: 28px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .result-details p {
+            margin: 12px 0;
+            font-size: 1.1em;
+            color: #444;
+        }
+
+        .category-results {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #ddd;
+        }
+
+        .category-item {
+            margin: 10px 0;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .category-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .category-score {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .btn-restart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 50px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-restart:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .feedback {
+            margin-top: 22px;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 1.05em;
+            display: none;
+            line-height: 1.7;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #2e7d32;
+            border: 2px solid #4caf50;
+        }
+
+        .feedback.incorrect {
+            background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+            color: #c62828;
+            border: 2px solid #f44336;
+        }
+
+        .feedback strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.15em;
+        }
+
+        .comparison-highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .subtitle {
+                font-size: 1em;
+            }
+
+            .question {
+                font-size: 1.15em;
+            }
+
+            .option {
+                font-size: 0.95em;
+                padding: 14px 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Jazz/Pop vs. Klassik 🎼</h1>
+        <div class="subtitle">Detaillierter Vergleich: Unterschiede & Gemeinsamkeiten</div>
+        
+        <div class="info-box">
+            <p><strong>Über dieses Quiz:</strong> Dieses Quiz untersucht präzise Unterschiede UND Gemeinsamkeiten zwischen Jazz/Pop und klassischer Musik. Es geht um Notation, Improvisation, Harmonik, Form, Performance-Praxis und historische Entwicklungen.</p>
+        </div>
+        
+        <div class="quiz-container">
+            <div class="quiz-info">
+                <p>Frage <span id="current-question">1</span> von <span id="total-questions">45</span>
+                <span class="category-badge" id="category-badge">Kategorie</span>
+                </p>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress"></div>
+            </div>
+            
+            <div class="question-container">
+                <div class="question" id="question"></div>
+                <div class="options" id="options"></div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn-next" id="next-btn" disabled>Nächste Frage</button>
+            </div>
+        </div>
+
+        <div class="result-container" id="result-container">
+            <h2>Quiz Abgeschlossen! 🎊</h2>
+            <div class="score" id="score"></div>
+            <div class="result-message" id="result-message"></div>
+            <div class="result-details">
+                <p><strong>Richtig beantwortet:</strong> <span id="correct-count"></span></p>
+                <p><strong>Falsch beantwortet:</strong> <span id="incorrect-count"></span></p>
+                <p><strong>Genauigkeit:</strong> <span id="accuracy"></span>%</p>
+                <div class="category-results">
+                    <p><strong>Leistung nach Themenbereich:</strong></p>
+                    <div id="category-breakdown"></div>
+                </div>
+            </div>
+            <button class="btn-restart" id="restart-btn">Quiz neu starten</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // NOTATION & SCHRIFTLICHKEIT
+            {
+                question: "Wie unterscheiden sich Jazz/Pop und Klassik in der Rolle der Notation?",
+                context: "Betrachten Sie die Funktion von Noten in beiden Genres.",
+                options: [
+                    "Beide verwenden Notation identisch als exakte Vorschrift",
+                    "Pop verwendet mehr Notation als Klassik",
+                    "Jazz verwendet keine Notation, Klassik immer vollständig notiert",
+                    "Klassik: Notation als präzise Anweisung; Jazz/Pop: Notation als Rahmen mit Improvisationsfreiheit"
+                ],
+                correct: 3,
+                category: "Unterschied",
+                explanation: "In der Klassik ist die Notation eine <span class='comparison-highlight'>präzise Vorschrift</span> für die Interpretation. In Jazz/Pop dient sie oft als <span class='comparison-highlight'>Gerüst</span> (Lead Sheet mit Akkordfolgen), das Raum für Improvisation und individuelle Interpretation lässt. Beide nutzen Notation, aber mit unterschiedlichem Verbindlichkeitsgrad."
+            },
+            {
+                question: "Welche Gemeinsamkeit teilen Jazz/Pop und Klassik bezüglich Notation?",
+                options: [
+                    "Beide notieren nie Dynamik",
+                    "Beide verwenden das gleiche westliche Notationssystem mit 5 Linien",
+                    "Beide verwenden ausschließlich Tabulaturen",
+                    "Beide verzichten komplett auf geschriebene Noten"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "Eine wichtige <span class='comparison-highlight'>Gemeinsamkeit</span>: Beide Genres nutzen das traditionelle westliche Notensystem mit 5 Linien, Notenschlüsseln, Takt- und Tonartangaben. Dies ermöglicht gegenseitiges Verständnis und Austausch zwischen den Genres."
+            },
+            {
+                question: "Was ist ein wesentlicher Unterschied in der Detailgenauigkeit der Notation?",
+                options: [
+                    "Pop verzichtet komplett auf Notenschrift",
+                    "Klassik notiert oft Artikulation, Dynamik, Tempo präzise; Jazz/Pop oft nur Melodie + Akkorde",
+                    "Jazz notiert mehr Details als Klassik",
+                    "Beide notieren immer gleich detailliert"
+                ],
+                correct: 1,
+                category: "Unterschied",
+                explanation: "Klassische Partituren enthalten <span class='comparison-highlight'>detaillierte Angaben</span> zu Artikulation (staccato, legato), Dynamik (pp-ff), Phrasierung, Fingersätzen. Jazz/Pop-Charts (Lead Sheets) zeigen oft nur <span class='comparison-highlight'>Melodie und Akkordsymbole</span>, der Rest wird vom Musiker gestaltet."
+            },
+
+            // IMPROVISATION
+            {
+                question: "Wie unterscheidet sich die Rolle der Improvisation?",
+                options: [
+                    "Klassik improvisiert mehr als Jazz",
+                    "Keine der beiden Richtungen improvisiert",
+                    "Jazz/Pop: zentral und erwartet; Klassik: historisch vorhanden, heute meist nicht praktiziert",
+                    "Beide improvisieren gleich viel"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Im Jazz ist Improvisation <span class='comparison-highlight'>Kern der Kunstform</span> - Soli über Akkordfolgen sind essenziell. In der Klassik gab es Improvisationstradition (Bach, Mozart, Liszt), heute wird aber meist <span class='comparison-highlight'>streng nach Noten</span> gespielt. Historisch gesehen ist dies ein kultureller Wandel, kein absoluter Gegensatz."
+            },
+            {
+                question: "Welche Gemeinsamkeit existiert bezüglich Improvisation historisch?",
+                options: [
+                    "Nur Jazz hat Improvisation erfunden",
+                    "Improvisation ist in Klassik verboten",
+                    "Beide Traditionen hatten/haben Improvisationspraktiken",
+                    "Keine der beiden hat jemals improvisiert"
+                ],
+                correct: 2,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Wichtige Gemeinsamkeit</span>: Barock- und Klassik-Meister (Bach, Mozart, Beethoven) waren brillante Improvisatoren. Kadenzen in Konzerten waren Improvisationsräume. Jazz führt diese Tradition fort. Der Unterschied ist eher <span class='comparison-highlight'>zeitlich</span> als grundsätzlich."
+            },
+            {
+                question: "Was ist der Unterschied in der Art der Improvisation?",
+                options: [
+                    "Jazz improvisiert nur rhythmisch",
+                    "Kein Unterschied in der Art",
+                    "Jazz: über Akkordprogressionen und Skalen; Klassik (historisch): über harmonische Gerüste und Verzierungen",
+                    "Klassik improvisiert nur melodisch"
+                ],
+                correct: 2,
+                category: "Nuance",
+                explanation: "Jazz-Improvisation basiert auf <span class='comparison-highlight'>Akkordfolgen, Skalen und Modi</span> (Changes). Historische klassische Improvisation nutzte <span class='comparison-highlight'>harmonische Gerüste, Verzierungen und Figurationen</span>. Beide Ansätze sind harmonisch fundiert, aber mit unterschiedlichen Schwerpunkten."
+            },
+
+            // HARMONIK
+            {
+                question: "Wie unterscheidet sich die Harmonik grundlegend?",
+                options: [
+                    "Jazz verwendet keine Harmonik",
+                    "Beide verwenden identische Harmonik",
+                    "Klassik ist harmonisch komplexer als Jazz",
+                    "Klassik: funktionale Harmonik (T-S-D); Jazz/Pop: erweiterte Akkorde, Quartenschichtungen, Modalität"
+                ],
+                correct: 3,
+                category: "Unterschied",
+                explanation: "Klassische Harmonik basiert auf <span class='comparison-highlight'>funktionaler Harmonik</span> (Tonika-Subdominante-Dominante). Jazz erweitert dies mit <span class='comparison-highlight'>Septim-, Non-, Undezim-Akkorden</span>, Alterationen, modaler Harmonik und Quartenschichtungen. Jazz ist harmonisch oft komplexer und chromatischer."
+            },
+            {
+                question: "Welche harmonische Gemeinsamkeit teilen beide?",
+                options: [
+                    "Beide verwenden ausschließlich Atonalität",
+                    "Keine harmonischen Gemeinsamkeiten",
+                    "Beide basieren auf dem tonalen System und Dur/Moll-Tonalität",
+                    "Beide vermeiden Kadenzen"
+                ],
+                correct: 2,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Fundamentale Gemeinsamkeit</span>: Beide Genres wurzeln im <span class='comparison-highlight'>tonalen System</span> mit Dur/Moll-Tonalität. Selbst komplexe Jazz-Harmonik referenziert Tonika-Dominante-Beziehungen. Die 12-Ton-Chromatik ist die gemeinsame Basis."
+            },
+            {
+                question: "Was ist charakteristisch für Jazz-Harmonik im Vergleich zur klassischen?",
+                options: [
+                    "Klassik verwendet mehr Dissonanzen",
+                    "Jazz harmonisiert einstimmig",
+                    "Jazz nutzt häufiger Sekundärdominanten, Substitutionen und erweiterte Akkorde",
+                    "Jazz vermeidet Akkorde komplett"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Jazz nutzt intensiv <span class='comparison-highlight'>II-V-I-Progressionen, Tritonus-Substitutionen, erweiterte Terzen (9,11,13)</span> und Reharmonisation. Klassik hat klarere funktionale Hierarchien. Jazz-Harmonik ist 'vertikaler' mit mehr simultanen Dissonanzen."
+            },
+            {
+                question: "Welche Rolle spielen Dissonanzen in beiden Genres?",
+                options: [
+                    "Beide behandeln Dissonanzen identisch",
+                    "Jazz verwendet keine Dissonanzen",
+                    "Klassik vermeidet Dissonanzen komplett",
+                    "Klassik: Dissonanzen werden vorbereitet und aufgelöst; Jazz: Dissonanzen als Farbklänge"
+                ],
+                correct: 3,
+                category: "Nuance",
+                explanation: "In der Klassik werden Dissonanzen traditionell <span class='comparison-highlight'>vorbereitet, gehalten und aufgelöst</span> (Vorhaltslehre). Im Jazz sind Dissonanzen oft <span class='comparison-highlight'>Klangfarben ohne Auflösungszwang</span> (maj7, #11, b9). Moderne Klassik (20. Jh.) nähert sich Jazz-Dissonanzbehandlung an."
+            },
+
+            // RHYTHMIK & GROOVE
+            {
+                question: "Was ist der Hauptunterschied in der Rhythmik?",
+                options: [
+                    "Jazz verwendet keine Rhythmik",
+                    "Beide haben identische Rhythmik",
+                    "Jazz/Pop: Swing, Synkopen, Off-Beat-Betonung; Klassik: meist metrisch klare Betonung",
+                    "Klassik hat mehr Synkopen als Jazz"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Jazz zeichnet sich durch <span class='comparison-highlight'>Swing-Feeling, Synkopen, Off-Beat-Akzente</span> aus. Pop nutzt repetitive Grooves. Klassik hat meist <span class='comparison-highlight'>metrisch klarere Strukturen</span> mit Betonung auf Zählzeiten. Ausnahmen: Strawinsky, Bartók nutzten komplexe Rhythmik."
+            },
+            {
+                question: "Welche rhythmische Gemeinsamkeit existiert?",
+                options: [
+                    "Jazz verwendet keine Taktarten",
+                    "Klassik kennt keinen Rhythmus",
+                    "Beide verwenden Taktarten und metrische Organisation",
+                    "Beide spielen nur ohne Takt"
+                ],
+                correct: 2,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Gemeinsame Basis</span>: Beide nutzen <span class='comparison-highlight'>Taktarten (4/4, 3/4, 6/8 etc.)</span> und metrische Organisation. Die Notation von Rhythmen folgt denselben Prinzipien (Viertelnoten, Achtel, Pausen etc.)."
+            },
+            {
+                question: "Was ist der 'Swing' im Jazz und wie unterscheidet er sich von klassischer Rhythmik?",
+                options: [
+                    "Klassik kennt nur Swing-Rhythmen",
+                    "Swing: ungleiche Achtelteilung (lang-kurz); Klassik: meist gleiche Achtelteilung",
+                    "Swing bedeutet sehr langsames Tempo",
+                    "Kein Unterschied vorhanden"
+                ],
+                correct: 1,
+                category: "Nuance",
+                explanation: "Im Jazz werden Achtel im Swing <span class='comparison-highlight'>ungleich gespielt</span> (etwa Triolenfühlung: lang-kurz-lang-kurz). In der Klassik werden Achtel meist <span class='comparison-highlight'>exakt gleich</span> gespielt. Dies erzeugt das charakteristische 'Grooven' des Jazz."
+            },
+            {
+                question: "Welche Rolle spielt Polyrhythmik?",
+                options: [
+                    "Nur Jazz nutzt Polyrhythmik",
+                    "Beide können Polyrhythmik nutzen, aber mit unterschiedlichen Ursprüngen (Klassik: z.B. 3:2, Jazz: afrikanische Wurzeln)",
+                    "Keine von beiden nutzt Polyrhythmik",
+                    "Nur Klassik nutzt Polyrhythmik"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide nutzen Polyrhythmik</span>: Klassik durch Hemiolen (3:2 in Barock/Romantik), Jazz durch afrikanische Wurzeln (Cross-Rhythms, Clave-Patterns). Unterschiedliche kulturelle Quellen, ähnliches Ergebnis."
+            },
+
+            // FORM & STRUKTUR
+            {
+                question: "Wie unterscheiden sich formale Strukturen?",
+                options: [
+                    "Pop verwendet Sonatenform",
+                    "Klassik: komplexe Großformen (Sonate, Fuge); Jazz/Pop: meist kürzere Formen (AABA, 12-Bar Blues)",
+                    "Jazz hat längere Formen als Klassik",
+                    "Klassik kennt keine Formen"
+                ],
+                correct: 1,
+                category: "Unterschied",
+                explanation: "Klassik entwickelte <span class='comparison-highlight'>großdimensionierte Formen</span> (Sonatensatzform, Fuge, Rondo, Variationen). Jazz/Pop bevorzugt <span class='comparison-highlight'>kompaktere Formen</span> (AABA, 12-Bar Blues, Vers-Refrain). Klassische Werke dauern oft 20-60 Minuten, Pop-Songs 3-5 Minuten."
+            },
+            {
+                question: "Welche formale Gemeinsamkeit existiert?",
+                options: [
+                    "Klassik vermeidet jede Struktur",
+                    "Beide nutzen Wiederholung, Kontrast und Variation als Formprinzipien",
+                    "Jazz verwendet keine Wiederholungen",
+                    "Beide haben keine Formstrukturen"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Universelles Formprinzip</span>: Beide nutzen <span class='comparison-highlight'>Wiederholung (A-A), Kontrast (A-B) und Variation (A-A')</span>. AABA im Jazz entspricht der Liedform in Klassik. Das Prinzip 'Exposition-Entwicklung-Wiederkehr' ist übergreifend."
+            },
+            {
+                question: "Was ist charakteristisch für die Formgestaltung in der Performance?",
+                options: [
+                    "Jazz hält sich strikt an die Form",
+                    "Klassik improvisiert die Form",
+                    "Klassik: Form ist durch Komposition festgelegt; Jazz: Form wird in Performance durch Soli erweitert",
+                    "Beide erweitern die Form identisch"
+                ],
+                correct: 2,
+                category: "Nuance",
+                explanation: "In der Klassik ist die Form <span class='comparison-highlight'>komponiert und fixiert</span>. Im Jazz ist das 'Head' (Thema) kurz, aber durch <span class='comparison-highlight'>Solo-Chorus-Runden wird die Form in der Performance erweitert</span> - jede Aufführung kann unterschiedlich lang sein."
+            },
+            {
+                question: "Wie verwenden beide Genres das Variationsprinzip?",
+                options: [
+                    "Beide variieren identisch",
+                    "Jazz variiert nie",
+                    "Klassik: systematische thematische Variation; Jazz: Improvisation als spontane Variation",
+                    "Klassik kennt keine Variationen"
+                ],
+                correct: 2,
+                category: "Nuance",
+                explanation: "Beide nutzen Variation! Klassik: <span class='comparison-highlight'>komponierte Variationswerke</span> (z.B. Goldberg-Variationen). Jazz: <span class='comparison-highlight'>improvisierte Variationen</span> über das Thema (Chorus nach Chorus). Unterschied: geplant vs. spontan."
+            },
+
+            // INSTRUMENTIERUNG & KLANG
+            {
+                question: "Was unterscheidet die Instrumentierung hauptsächlich?",
+                options: [
+                    "Beide verwenden identische Instrumente",
+                    "Jazz nutzt keine modernen Instrumente",
+                    "Klassik verwendet mehr E-Gitarren",
+                    "Klassik: akustische Orchesterinstrumente; Jazz/Pop: oft Verstärkung, E-Gitarre, Synthesizer"
+                ],
+                correct: 3,
+                category: "Unterschied",
+                explanation: "Klassik nutzt traditionell <span class='comparison-highlight'>akustische Instrumente</span> (Streicher, Holz-/Blechbläser, Klavier). Jazz/Pop integriert <span class='comparison-highlight'>verstärkte/elektronische Instrumente</span> (E-Bass, E-Gitarre, Keyboards, Drum-Set). Moderne klassische Musik experimentiert aber auch mit Elektronik."
+            },
+            {
+                question: "Welche Instrumentenfamilie nutzen beide?",
+                options: [
+                    "Jazz verwendet keine Blasinstrumente",
+                    "Beide nutzen Bläser (Saxophon in Jazz, Holz-/Blechbläser in Klassik)",
+                    "Klassik kennt keine Bläser",
+                    "Keine gemeinsamen Instrumente"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Blasinstrumente sind gemeinsam</span>: Trompete, Posaune, Klarinette kommen in beiden vor. Saxophon ist Jazz-typisch, aber Komponisten wie Ravel integrierten es in klassische Werke. Klavier ist in beiden zentral."
+            },
+            {
+                question: "Was ist der Unterschied in der Klangerzeugung?",
+                options: [
+                    "Keine Unterschiede in der Spielweise",
+                    "Klassik nutzt mehr erweiterte Techniken",
+                    "Klassik: traditionelle Spieltechniken; Jazz: erweiterte Techniken (Growl, Plunger, Bends)",
+                    "Jazz nutzt nur traditionelle Techniken"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Jazz entwickelte <span class='comparison-highlight'>spezifische Spielweisen</span>: Growl (Brummen), Plunger-Dämpfer, Bends, Ghost Notes. Klassik nutzt traditionell 'reine' Töne, moderne Klassik (20. Jh.) experimentiert aber mit erweiterten Techniken."
+            },
+            {
+                question: "Welche Rolle spielt das Schlagzeug?",
+                options: [
+                    "Beide nutzen Schlagzeug identisch",
+                    "Jazz/Pop: Drum-Set ist zentral für Groove; Klassik: Pauken/Percussion meist begleitend oder akzentuierend",
+                    "Jazz verwendet kein Schlagzeug",
+                    "Klassik nutzt mehr Schlagzeug als Jazz"
+                ],
+                correct: 1,
+                category: "Unterschied",
+                explanation: "Im Jazz ist das <span class='comparison-highlight'>Drum-Set rhythmisch zentral</span> und interaktiv (Ride-Pattern, Comping). In der Klassik sind <span class='comparison-highlight'>Pauken/Percussion oft akzentuierend</span> oder koloristisch, selten durchgehend präsent. Ausnahme: Moderne Werke."
+            },
+
+            // PERFORMANCE-PRAXIS
+            {
+                question: "Wie unterscheidet sich die Performance-Praxis?",
+                options: [
+                    "Klassik ist komplett spontan",
+                    "Beide sind identisch spontan",
+                    "Jazz ist komplett einstudiert",
+                    "Klassik: meist einstudiert und reproduziert; Jazz: spontane Interaktion und Improvisation"
+                ],
+                correct: 3,
+                category: "Unterschied",
+                explanation: "Klassische Konzerte reproduzieren <span class='comparison-highlight'>einstudierte Interpretationen</span> (Proben, Dirigent). Jazz-Performance ist <span class='comparison-highlight'>spontaner, interaktiver</span> - Musiker hören aufeinander und reagieren. Jede Jazz-Performance ist einzigartig."
+            },
+            {
+                question: "Welche Gemeinsamkeit existiert in der Performance?",
+                options: [
+                    "Jazz erfordert kein Training",
+                    "Beide erfordern hohe technische Virtuosität und jahrelanges Training",
+                    "Klassik braucht keine Technik",
+                    "Keine technischen Anforderungen"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide verlangen Exzellenz</span>: Klassik-Musiker trainieren Technik, Interpretation. Jazz-Musiker trainieren Technik, Improvisation, Harmonielehre. Beide benötigen <span class='comparison-highlight'>jahrzehntelanges Studium</span> für Meisterschaft."
+            },
+            {
+                question: "Wie unterscheiden sich Aufführungsorte traditionell?",
+                options: [
+                    "Beide haben identische Aufführungsorte",
+                    "Jazz wird nur in Konzertsälen gespielt",
+                    "Klassik: Konzertsäle mit Sitzplätzen; Jazz: Clubs mit Tischbestuhlung, informeller",
+                    "Klassik wird nur in Clubs gespielt"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Klassik: <span class='comparison-highlight'>formelle Konzertsäle</span> (Stille, Applaus nach Sätzen). Jazz: traditionell <span class='comparison-highlight'>informelle Clubs</span> (Gespräche, Getränke, Applaus nach Soli). Heute gibt es aber Cross-Over: Jazz in Konzertsälen, Klassik in alternativen Räumen."
+            },
+            {
+                question: "Welche Rolle spielt die Publikumsinteraktion?",
+                options: [
+                    "Jazz-Publikum ist komplett still",
+                    "Klassik-Publikum ist interaktiver",
+                    "Beide haben identisches Publikumsverhalten",
+                    "Klassik: Publikum hört still zu; Jazz/Pop: oft aktive Reaktionen während der Performance"
+                ],
+                correct: 3,
+                category: "Unterschied",
+                explanation: "Klassische Konzerte erwarten <span class='comparison-highlight'>Stille und Konzentration</span>. Jazz/Pop erlaubt <span class='comparison-highlight'>Zwischenapplaus, Zurufe ('Yeah!'), Mitwippen</span>. Historisch war aber auch klassische Musik einst interaktiver (Mozart-Zeit)."
+            },
+
+            // AUSBILDUNG & LERNPROZESS
+            {
+                question: "Wie unterscheidet sich die musikalische Ausbildung?",
+                options: [
+                    "Klassik lernt man nur informell",
+                    "Klassik: formale Ausbildung, Konservatorien; Jazz: oft informelles Lernen, Jam Sessions",
+                    "Beide haben identische Ausbildungswege",
+                    "Jazz hat formalere Ausbildung"
+                ],
+                correct: 1,
+                category: "Unterschied",
+                explanation: "Klassik: <span class='comparison-highlight'>strukturierte Ausbildung</span> an Konservatorien, nach Lehrplan. Jazz: traditionell <span class='comparison-highlight'>Meister-Schüler-Prinzip, Learning by Doing</span> in Jam Sessions. Heute gibt es auch Jazz-Studiengänge, aber die Tradition unterscheidet sich."
+            },
+            {
+                question: "Welche Gemeinsamkeit existiert in der Ausbildung?",
+                options: [
+                    "Klassik braucht keine Technik",
+                    "Jazz braucht keine Theorie",
+                    "Beide erfordern Gehörbildung, Theorie und instrumentale Technik",
+                    "Keine gemeinsamen Ausbildungsinhalte"
+                ],
+                correct: 2,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide lehren</span>: Gehörbildung, Musiktheorie, Instrumentaltechnik. Unterschied: Klassik betont Repertoire und Notation, Jazz betont Improvisation und Akkordprogressionen. Beide brauchen <span class='comparison-highlight'>fundierte musikalische Bildung</span>."
+            },
+            {
+                question: "Was ist der Hauptfokus beim Üben?",
+                options: [
+                    "Beide üben identisch",
+                    "Klassik improvisiert beim Üben",
+                    "Jazz übt nur nach Noten",
+                    "Klassik: Perfektion eines Stücks nach Noten; Jazz: Beherrschung von Skalen, Patterns, Transkriptionen"
+                ],
+                correct: 3,
+                category: "Nuance",
+                explanation: "Klassiker üben <span class='comparison-highlight'>spezifische Werke bis zur Perfektion</span>. Jazzer üben <span class='comparison-highlight'>Vokabular (Licks, Scales, Standards)</span> zur flexiblen Anwendung. Klassik: werkzentriert. Jazz: prinzipienzentriert."
+            },
+
+            // KOMPOSITION VS. INTERPRETATION
+            {
+                question: "Wie unterscheidet sich die Rolle des Komponisten/Schöpfers?",
+                options: [
+                    "Jazz-Komponisten schreiben alles vor",
+                    "Keine Unterschiede",
+                    "Klassik: Komponist schafft fertiges Werk; Jazz/Pop: Komponist gibt Rahmen, Performance vollendet es",
+                    "Klassik-Komponisten lassen alles offen"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "In der Klassik ist der <span class='comparison-highlight'>Komponist die Hauptautorität</span> - das Werk ist 'fertig'. Im Jazz ist der <span class='comparison-highlight'>Performer Co-Autor</span> - das Stück wird durch Improvisation vollendet. Miles Davis' 'So What': Vorlage + Performance = Kunstwerk."
+            },
+            {
+                question: "Welche Gemeinsamkeit existiert in der Interpretation?",
+                options: [
+                    "Beide spielen mechanisch",
+                    "Jazz hat keine interpretatorischen Freiheiten",
+                    "Beide erfordern interpretatorische Entscheidungen über Ausdruck, Tempo, Dynamik",
+                    "Klassik erlaubt keine Interpretation"
+                ],
+                correct: 2,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide Genres erfordern Interpretation</span>: Klassik interpretiert Tempo, Phrasierung, Ausdruck innerhalb der Notation. Jazz interpretiert das Thema und improvisiert. Beide erfordern <span class='comparison-highlight'>künstlerische Entscheidungen</span>."
+            },
+            {
+                question: "Wie unterscheidet sich das Verhältnis zur Original-Version?",
+                options: [
+                    "Beide sind identisch werkgetreu",
+                    "Jazz strebt Werktreue an",
+                    "Klassik transformiert immer radikal",
+                    "Klassik: Werktreue angestrebt; Jazz: Neuinterpretation und Transformation gewünscht"
+                ],
+                correct: 3,
+                category: "Nuance",
+                explanation: "Klassik: Ideal der <span class='comparison-highlight'>Werktreue</span> zur Komposition. Jazz: <span class='comparison-highlight'>Transformation ist erwünscht</span> - 'My Funny Valentine' hat hunderte verschiedene Versionen. Jazz schätzt Neuinterpretation, Klassik respektiert das Original."
+            },
+
+            // GESCHICHTE & ENTWICKLUNG
+            {
+                question: "Wie unterscheiden sich die historischen Wurzeln?",
+                options: [
+                    "Klassik kommt aus Afrika",
+                    "Jazz kommt aus Europa",
+                    "Klassik: europäische Kunstmusiktradition; Jazz/Pop: afroamerikanische und populäre Traditionen",
+                    "Beide haben identische Ursprünge"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Klassik wurzelt in <span class='comparison-highlight'>europäischer Kirchenmusik und Hofkultur</span> (Mittelalter-Romantik). Jazz entstand aus <span class='comparison-highlight'>afroamerikanischen Traditionen</span> (Blues, Spirituals, Ragtime) im frühen 20. Jh. USA. Pop entwickelte sich aus Folk und kommerzieller Unterhaltungsmusik."
+            },
+            {
+                question: "Welche historische Gemeinsamkeit verbindet beide?",
+                options: [
+                    "Jazz hat keine Entwicklungsgeschichte",
+                    "Beide entwickelten sich durch kulturellen Austausch und gesellschaftliche Veränderungen",
+                    "Klassik veränderte sich nie",
+                    "Beide entstanden im Vakuum ohne Einflüsse"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide sind lebendige Traditionen</span>, die sich durch <span class='comparison-highlight'>kulturellen Austausch, Technologie und Gesellschaft</span> entwickelten. Klassik: Barock→Klassik→Romantik→Moderne. Jazz: New Orleans→Swing→Bebop→Free Jazz→Fusion."
+            },
+            {
+                question: "Wie unterscheidet sich die Beziehung zur Tradition?",
+                options: [
+                    "Klassik innoviert mehr als Jazz",
+                    "Beide haben identisches Traditionsverhältnis",
+                    "Klassik: Bewahrung historischer Werke; Jazz: ständige Innovation und Neuerfindung",
+                    "Jazz bewahrt nur historische Aufnahmen"
+                ],
+                correct: 2,
+                category: "Nuance",
+                explanation: "Klassik: <span class='comparison-highlight'>Museums-Funktion</span> - historische Werke werden bewahrt und gespielt (Bach, Mozart leben weiter). Jazz: <span class='comparison-highlight'>ständige Erneuerung</span> - alte Standards werden neu interpretiert, Stile entwickeln sich weiter. Beide wertschätzen Tradition, aber unterschiedlich."
+            },
+
+            // AUFNAHME & MEDIEN
+            {
+                question: "Wie unterscheidet sich die Aufnahmepraxis?",
+                options: [
+                    "Beide haben identische Aufnahmetechniken",
+                    "Jazz macht keine Aufnahmen",
+                    "Klassik: oft Live-Aufnahmen oder mehrere Takes; Jazz: oft spontane Studio-Sessions, wenig Editing",
+                    "Klassik nimmt nur mit Overdubs auf"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Klassische Aufnahmen: oft <span class='comparison-highlight'>perfektionierte Takes mit Editing</span>, Live-Mitschnitte. Jazz: Tradition der <span class='comparison-highlight'>Live-Studio-Sessions</span> (Miles Davis, Coltrane) mit Spontaneität. Pop: hochproduziert mit Overdubs. Unterschiedliche Studio-Philosophien."
+            },
+            {
+                question: "Welche Rolle spielen Aufnahmen in beiden Genres?",
+                options: [
+                    "Keine Rolle in beiden",
+                    "Aufnahmen sind nur in Jazz wichtig",
+                    "Klassik verbietet Aufnahmen",
+                    "Beide nutzen Aufnahmen zur Dokumentation, Verbreitung und als Lernressource"
+                ],
+                correct: 3,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide nutzen Aufnahmen</span>: Klassik dokumentiert interpretatorische Traditionen (Karajan, Bernstein). Jazz-Aufnahmen sind essenzielle Lehrmittel (Transkriptionen). <span class='comparison-highlight'>Beide Genres wurden durch Aufnahmetechnik transformiert</span>."
+            },
+
+            // CROSS-OVER & MODERNE ENTWICKLUNGEN
+            {
+                question: "Wie beeinflussen sich beide Genres heute?",
+                options: [
+                    "Jazz lehnt klassische Einflüsse ab",
+                    "Zunehmende Cross-Over-Projekte: Klassik-Musiker spielen Jazz, Jazz nutzt klassische Kompositionstechniken",
+                    "Klassik ignoriert Jazz komplett",
+                    "Beide Genres bleiben strikt getrennt"
+                ],
+                correct: 1,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Moderne Verschmelzung</span>: Third Stream, Kammermusik-Jazz (Brad Mehldau), Klassik-Komponisten integrieren Jazz-Harmonik (Bernstein, Gershwin). <span class='comparison-highlight'>Grenzen verschwimmen</span> zunehmend."
+            },
+            {
+                question: "Was ist eine moderne Gemeinsamkeit?",
+                options: [
+                    "Klassik ist Mainstream-Musik",
+                    "Jazz ist populärer als Pop",
+                    "Beide kämpfen um Relevanz in der populären Kultur und suchen neue Publikumsformen",
+                    "Beide dominieren die Charts"
+                ],
+                correct: 2,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Geteilte Herausforderung</span>: Beide sind heute 'Kunstmusik' und kämpfen gegen kommerzielle Pop-Dominanz. Beide suchen neue Wege: <span class='comparison-highlight'>Streaming, Social Media, Hybrid-Venues</span>. Klassik und Jazz sind kulturell marginalisierter geworden."
+            },
+            {
+                question: "Welche Rolle spielt Kommerz?",
+                options: [
+                    "Alle sind gleich kommerziell",
+                    "Klassik ist am kommerziellsten",
+                    "Pop: stark kommerziell orientiert; Klassik/Jazz: eher künstlerisch orientiert (mit Ausnahmen)",
+                    "Jazz ist die kommerziellste Musik"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Pop-Musik ist <span class='comparison-highlight'>primär marktgetrieben</span> (Charts, Streams, Verkäufe). Klassik/Jazz betonen <span class='comparison-highlight'>künstlerische Integrität</span> über Kommerz (mit Ausnahmen: Crossover-Stars). Unterschiedliche Wertesysteme."
+            },
+
+            // KOMPLEXITÄT & ZUGÄNGLICHKEIT
+            {
+                question: "Wie unterscheidet sich die Zugänglichkeit für Hörer?",
+                options: [
+                    "Jazz ist einfacher als Pop",
+                    "Klassik ist sofort zugänglich",
+                    "Alle sind gleich zugänglich",
+                    "Pop: sofort zugänglich; Klassik/Jazz: oft Kontext und Wissen erforderlich"
+                ],
+                correct: 3,
+                category: "Unterschied",
+                explanation: "Pop ist auf <span class='comparison-highlight'>sofortige Eingängigkeit</span> ausgelegt (Hooks, Refrains). Klassik/Jazz erfordern oft <span class='comparison-highlight'>aktives Hören und Kontext</span> für volle Wertschätzung. Komplexität vs. Zugänglichkeit - unterschiedliche Ziele."
+            },
+            {
+                question: "Welche Gemeinsamkeit existiert bezüglich emotionaler Wirkung?",
+                options: [
+                    "Keine emotionale Wirkung",
+                    "Nur Jazz berührt Emotionen",
+                    "Nur Klassik ist emotional",
+                    "Beide können tiefe emotionale Erlebnisse vermitteln und Publikum berühren"
+                ],
+                correct: 3,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Universelle Gemeinsamkeit</span>: Beide können <span class='comparison-highlight'>tief berühren, Emotionen wecken, transzendente Erlebnisse</span> schaffen. Beethovens 9. Sinfonie und Coltrane's 'A Love Supreme' wirken auf unterschiedliche Weise, aber beide sind zutiefst bewegend."
+            },
+            {
+                question: "Was ist der Unterschied in der musikalischen Komplexität?",
+                options: [
+                    "Beide sind gleich komplex",
+                    "Klassik ist immer komplexer",
+                    "Unterschiedliche Komplexitätsarten: Klassik oft formal/strukturell, Jazz oft harmonisch/rhythmisch",
+                    "Jazz ist immer einfacher"
+                ],
+                correct: 2,
+                category: "Nuance",
+                explanation: "Komplexität manifestiert sich unterschiedlich: Klassik in <span class='comparison-highlight'>formaler Architektur und Orchestrierung</span>, Jazz in <span class='comparison-highlight'>harmonischer Dichte und improvisatorischer Interaktion</span>. Nicht 'mehr oder weniger', sondern 'anders' komplex."
+            },
+
+            // KULTURELLE BEDEUTUNG
+            {
+                question: "Welche kulturelle Rolle hatten beide historisch?",
+                options: [
+                    "Beide haben keine kulturelle Bedeutung",
+                    "Jazz war immer Hofmusik",
+                    "Klassik: Hof- und Kirchenmusik, Elite; Jazz: Ausdruck sozialer Bewegungen, Arbeiterklasse",
+                    "Beide waren immer Elite-Musik"
+                ],
+                correct: 2,
+                category: "Unterschied",
+                explanation: "Klassik war <span class='comparison-highlight'>Musik der Kirche, Höfe, Bildungsbürgertum</span>. Jazz entstand als <span class='comparison-highlight'>Ausdruck afroamerikanischer Erfahrung, soziale Protest-Musik</span>. Unterschiedliche Klassenkontexte und Funktionen."
+            },
+            {
+                question: "Welche Gemeinsamkeit haben beide als Kunstformen?",
+                options: [
+                    "Jazz ist keine Kunstform",
+                    "Beide sind nur Unterhaltung",
+                    "Nur Klassik ist Kunstmusik",
+                    "Beide werden als ernsthafte Kunstmusik anerkannt, die studiert und analysiert wird"
+                ],
+                correct: 3,
+                category: "Gemeinsamkeit",
+                explanation: "<span class='comparison-highlight'>Beide sind anerkannte Kunstformen</span>: akademisch studiert, kritisch analysiert, in Museen/Archiven bewahrt. Jazz wurde zur <span class='comparison-highlight'>'America's Classical Music'</span>. Beide transzendieren bloße Unterhaltung."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let answered = false;
+        let categoryStats = {};
+
+        // Initialize category statistics
+        quizData.forEach(q => {
+            if (!categoryStats[q.category]) {
+                categoryStats[q.category] = { correct: 0, total: 0 };
+            }
+            categoryStats[q.category].total++;
+        });
+
+        const questionEl = document.getElementById('question');
+        const optionsEl = document.getElementById('options');
+        const nextBtn = document.getElementById('next-btn');
+        const progressEl = document.getElementById('progress');
+        const currentQuestionEl = document.getElementById('current-question');
+        const totalQuestionsEl = document.getElementById('total-questions');
+        const feedbackEl = document.getElementById('feedback');
+        const resultContainer = document.getElementById('result-container');
+        const quizContainer = document.querySelector('.quiz-container');
+        const restartBtn = document.getElementById('restart-btn');
+        const categoryBadge = document.getElementById('category-badge');
+
+        totalQuestionsEl.textContent = quizData.length;
+
+        function loadQuestion() {
+            const current = quizData[currentQuestion];
+            let questionHTML = current.question;
+            
+            if (current.context) {
+                questionHTML += `<div class="question-context">${current.context}</div>`;
+            }
+            
+            questionEl.innerHTML = questionHTML;
+            optionsEl.innerHTML = '';
+            feedbackEl.classList.remove('show', 'correct', 'incorrect');
+            answered = false;
+            selectedAnswer = null;
+            nextBtn.disabled = true;
+
+            // Update category badge
+            categoryBadge.textContent = current.category;
+            categoryBadge.className = 'category-badge cat-' + getCategoryClass(current.category);
+
+            current.options.forEach((option, index) => {
+                const optionEl = document.createElement('div');
+                optionEl.classList.add('option');
+                optionEl.innerHTML = option;
+                optionEl.addEventListener('click', () => selectOption(index, optionEl));
+                optionsEl.appendChild(optionEl);
+            });
+
+            currentQuestionEl.textContent = currentQuestion + 1;
+            updateProgress();
+        }
+
+        function getCategoryClass(category) {
+            const mapping = {
+                'Unterschied': 'unterschied',
+                'Gemeinsamkeit': 'gemeinsamkeit',
+                'Nuance': 'nuance',
+                'Technik': 'technik',
+                'Praxis': 'praxis',
+                'Geschichte': 'geschichte'
+            };
+            return mapping[category] || 'unterschied';
+        }
+
+        function selectOption(index, element) {
+            if (answered) return;
+
+            document.querySelectorAll('.option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+
+            element.classList.add('selected');
+            selectedAnswer = index;
+            nextBtn.disabled = false;
+        }
+
+        function checkAnswer() {
+            if (answered || selectedAnswer === null) return;
+
+            answered = true;
+            const current = quizData[currentQuestion];
+            const options = document.querySelectorAll('.option');
+
+            options.forEach(opt => opt.classList.add('disabled'));
+
+            if (selectedAnswer === current.correct) {
+                options[selectedAnswer].classList.add('correct');
+                feedbackEl.innerHTML = '<strong>✓ Richtig!</strong><br>' + current.explanation;
+                feedbackEl.classList.add('show', 'correct');
+                score++;
+                categoryStats[current.category].correct++;
+            } else {
+                options[selectedAnswer].classList.add('incorrect');
+                options[current.correct].classList.add('correct');
+                feedbackEl.innerHTML = '<strong>✗ Falsch.</strong><br>' + current.explanation;
+                feedbackEl.classList.add('show', 'incorrect');
+            }
+
+            nextBtn.textContent = currentQuestion === quizData.length - 1 ? 'Ergebnis anzeigen' : 'Nächste Frage';
+        }
+
+        function nextQuestion() {
+            if (!answered) {
+                checkAnswer();
+                return;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                nextBtn.textContent = 'Weiter';
+            } else {
+                showResults();
+            }
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion) / quizData.length) * 100;
+            progressEl.style.width = progress + '%';
+        }
+
+        function showResults() {
+            quizContainer.style.display = 'none';
+            resultContainer.classList.add('show');
+
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('score').textContent = score + ' / ' + quizData.length;
+            document.getElementById('correct-count').textContent = score;
+            document.getElementById('incorrect-count').textContent = quizData.length - score;
+            document.getElementById('accuracy').textContent = percentage;
+
+            let message = '';
+            if (percentage >= 90) {
+                message = 'Außergewöhnlich! Sie haben ein tiefes Verständnis beider Genres! 🎵🎼🏆';
+            } else if (percentage >= 80) {
+                message = 'Hervorragend! Ihr Wissen über Unterschiede und Gemeinsamkeiten ist beeindruckend! 🎹👏';
+            } else if (percentage >= 70) {
+                message = 'Sehr gut! Sie erkennen wichtige Zusammenhänge! 🎸✨';
+            } else if (percentage >= 60) {
+                message = 'Gut gemacht! Einige Nuancen könnten noch vertieft werden. 📚';
+            } else if (percentage >= 50) {
+                message = 'Ordentlich! Weiter lernen lohnt sich. 💪';
+            } else {
+                message = 'Ein guter Anfang! Erkunden Sie beide Genres weiter. 🎵';
+            }
+
+            document.getElementById('result-message').textContent = message;
+
+            // Category breakdown
+            const categoryBreakdown = document.getElementById('category-breakdown');
+            categoryBreakdown.innerHTML = '';
+            
+            for (const [category, stats] of Object.entries(categoryStats)) {
+                const catPercentage = Math.round((stats.correct / stats.total) * 100);
+                const catDiv = document.createElement('div');
+                catDiv.className = 'category-item';
+                catDiv.innerHTML = `
+                    <span class="category-name">${category}</span>
+                    <span class="category-score">${stats.correct}/${stats.total} (${catPercentage}%)</span>
+                `;
+                categoryBreakdown.appendChild(catDiv);
+            }
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            selectedAnswer = null;
+            answered = false;
+            
+            // Reset category stats
+            for (const category in categoryStats) {
+                categoryStats[category].correct = 0;
+            }
+            
+            resultContainer.classList.remove('show');
+            quizContainer.style.display = 'block';
+            loadQuestion();
+        }
+
+        nextBtn.addEventListener('click', nextQuestion);
+        restartBtn.addEventListener('click', restartQuiz);
+
+        // Initial load
+        loadQuestion();
+    </script>
+</body>
+</html>
