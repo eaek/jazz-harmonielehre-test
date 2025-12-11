@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gehörbildung Quiz</title>
+    <meta name="description" content="Interaktives Quiz für Gehörbildung und Intervalle">
+    <style>
+        /* Reset und Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+        }
+
+        .app-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+            min-height: calc(100vh - 20px);
+        }
+
+        .header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        /* Start Screen */
+        .start-screen {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .start-screen h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .start-screen p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            font-weight: 600;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Quiz Screen */
+        .quiz-screen {
+            display: none;
+        }
+
+        .progress {
+            margin-bottom: 25px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-size: 1.1rem;
+            font-weight: 500;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .answers {
+            margin-bottom: 20px;
+        }
+
+        .answer {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .answer:active {
+            transform: scale(0.98);
+        }
+
+        .answer.selected {
+            background: #e3f2fd;
+            border-color: #2196f3;
+        }
+
+        .answer.correct {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        .answer.wrong {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        .next-btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .next-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Result Screen */
+        .result-screen {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .result-message {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .result-stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+            font-weight: bold;
+            border-top: 1px solid #ddd;
+            padding-top: 8px;
+        }
+
+        /* Mobile Optimierungen */
+        @media (max-width: 480px) {
+            .app-container {
+                margin: 5px;
+                min-height: calc(100vh - 10px);
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .content {
+                padding: 15px;
+            }
+            
+            .answer {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>🎵 Gehörbildung Quiz</h1>
+            <p>Intervalle • Klang • Harmonie</p>
+        </div>
+        
+        <div class="content">
+            <!-- Start Screen -->
+            <div class="start-screen" id="startScreen">
+                <h2>Willkommen!</h2>
+                <p>Testen Sie Ihr Wissen über Intervalle und Gehörbildung mit 30 sorgfältig ausgewählten Fragen.</p>
+                <p><strong>Themen:</strong> Intervallgrößen, Klangeigenschaften, bekannte Melodien, Harmonielehre</p>
+                <button class="btn" onclick="startQuiz()">Quiz starten 🎼</button>
+            </div>
+
+            <!-- Quiz Screen -->
+            <div class="quiz-screen" id="quizScreen">
+                <div class="progress">
+                    <div class="progress-header">
+                        <span>Frage <span id="currentQ">1</span> / 30</span>
+                        <span>🏆 <span id="score">0</span> Punkte</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <div class="question-box">
+                    <div class="question" id="questionText"></div>
+                </div>
+
+                <div class="answers" id="answersDiv"></div>
+
+                <button class="btn next-btn" id="nextButton" onclick="nextQuestion()" disabled>
+                    Weiter →
+                </button>
+            </div>
+
+            <!-- Result Screen -->
+            <div class="result-screen" id="resultScreen">
+                <div class="score-circle" id="finalScoreCircle"></div>
+                <div class="result-message" id="resultMessage"></div>
+                <div class="result-stats">
+                    <div class="stat-row">
+                        <span>Richtige Antworten:</span>
+                        <span id="correctAnswers"></span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Falsche Antworten:</span>
+                        <span id="wrongAnswers"></span>
+                    </div>
+                    <div class="stat-row">
+                        <span>Erfolgsquote:</span>
+                        <span id="percentage"></span>
+                    </div>
+                </div>
+                <button class="btn" onclick="restartQuiz()">Neues Quiz starten 🔄</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fragen-Datenbank
+        const quizData = [
+            {
+                q: "Wie viele Halbtonschritte hat eine große Terz?",
+                a: ["3 Halbtonschritte", "4 Halbtonschritte", "5 Halbtonschritte", "2 Halbtonschritte"],
+                c: 1
+            },
+            {
+                q: "Welches Intervall entsteht zwischen C und G?",
+                a: ["Große Terz", "Reine Quarte", "Reine Quinte", "Große Sexte"],
+                c: 2
+            },
+            {
+                q: "Wie klingt eine kleine Sekunde charakteristisch?",
+                a: ["Sehr konsonant", "Stark dissonant", "Neutral", "Mystisch"],
+                c: 1
+            },
+            {
+                q: "Was ist die Umkehrung einer reinen Quinte?",
+                a: ["Reine Quarte", "Große Terz", "Kleine Terz", "Große Sexte"],
+                c: 0
+            },
+            {
+                q: "Welches Intervall hat 6 Halbtonschritte?",
+                a: ["Reine Quarte", "Tritonus", "Reine Quinte", "Kleine Sexte"],
+                c: 1
+            },
+            {
+                q: "Welches Lied beginnt mit einer reinen Quarte?",
+                a: ["Frère Jacques", "Amazing Grace", "Hochzeitsmarsch", "My Bonnie"],
+                c: 2
+            },
+            {
+                q: "Wie viele Halbtonschritte hat eine kleine Septime?",
+                a: ["9", "10", "11", "8"],
+                c: 1
+            },
+            {
+                q: "Welches Intervall ist besonders konsonant?",
+                a: ["Große Septime", "Kleine Sekunde", "Reine Oktave", "Tritonus"],
+                c: 2
+            },
+            {
+                q: "Wie charakterisiert man eine große Sexte?",
+                a: ["Düster", "Strahlend", "Wehmütig-sehnsüchtig", "Neutral"],
+                c: 2
+            },
+            {
+                q: "Wo liegt in C-Dur eine kleine Terz?",
+                a: ["C-E", "E-G", "F-A", "G-H"],
+                c: 1
+            },
+            {
+                q: "Das 'My Bonnie' Motiv ist welches Intervall?",
+                a: ["Große Terz", "Quarte", "Große Sexte", "Quinte"],
+                c: 2
+            },
+            {
+                q: "Intervalle größer als eine Oktave heißen:",
+                a: ["Übermäßig", "Zusammengesetzt", "Erweitert", "Groß"],
+                c: 1
+            },
+            {
+                q: "Der Tritonus ist charakteristisch:",
+                a: ["Konsonant", "Sehr dissonant", "Rein", "Unauffällig"],
+                c: 1
+            },
+            {
+                q: "F zu H in C-Dur ist:",
+                a: ["Reine Quarte", "Reine Quinte", "Übermäßige Quarte", "Verminderte Quinte"],
+                c: 2
+            },
+            {
+                q: "Kleine Terz klingt im Vergleich zur großen:",
+                a: ["Heller", "Dunkler", "Gleich", "Lauter"],
+                c: 1
+            },
+            {
+                q: "Die 'Wolfsquinte' ist eine:",
+                a: ["Reine Quinte", "Übermäßige Quarte", "Verminderte Quinte", "Kleine Sexte"],
+                c: 2
+            },
+            {
+                q: "In 'Frère Jacques' bei 'Frè-re' hört man:",
+                a: ["Große Sekunde", "Kleine Terz", "Große Terz", "Quarte"],
+                c: 0
+            },
+            {
+                q: "Bei Intervallumkehrungen wird:",
+                a: ["Alles gleich", "Groß↔Klein", "Alles rein", "Alles übermäßig"],
+                c: 1
+            },
+            {
+                q: "Stärkste Auflösungstendenz hat:",
+                a: ["Oktave", "Große Septime", "Quinte", "Kleine Terz"],
+                c: 1
+            },
+            {
+                q: "Wie viele reine Intervalle gibt es?",
+                a: ["2 (Quarte/Quinte)", "3 (Prime/Quarte/Quinte)", "4 (Prime/Quarte/Quinte/Oktave)", "Alle können rein sein"],
+                c: 2
+            },
+            {
+                q: "Deutsche Nationalhymne 'Deutsch-land':",
+                a: ["Große Sekunde", "Quinte", "Große Terz", "Kleine Terz"],
+                c: 0
+            },
+            {
+                q: "Enharmonische Verwechslung bedeutet:",
+                a: ["Gleicher Klang, verschiedene Namen", "Verschiedene Oktaven", "Theoretische Intervalle", "Gleiche Qualität"],
+                c: 0
+            },
+            {
+                q: "'Diabolus in Musica' bezeichnet:",
+                a: ["Kleine Septime", "Tritonus", "Große Septime", "Kleine Sekunde"],
+                c: 1
+            },
+            {
+                q: "Konsonanz-Reihenfolge (konsonanteste zuerst):",
+                a: ["Oktave-Quinte-Quarte-Terzen", "Terzen-Quarte-Quinte-Oktave", "Quinte-Oktave-Quarte-Terzen", "Alle gleich"],
+                c: 0
+            },
+            {
+                q: "3. zu 5. Ton einer Dur-Tonleiter:",
+                a: ["Große Terz", "Kleine Terz", "Quarte", "Quinte"],
+                c: 0
+            },
+            {
+                q: "Verminderte Quinte wirkt:",
+                a: ["Stabil", "Auflösungsbedürftig", "Neutral", "Verstärkend"],
+                c: 1
+            },
+            {
+                q: "Kleinstes Intervall in temperierter Stimmung:",
+                a: ["Halbton", "Viertelton", "Achtelton", "Komma"],
+                c: 0
+            },
+            {
+                q: "Absteigende große Terz hört man bei:",
+                a: ["Kuckuck", "Swing Low", "Three Blind Mice", "Allen genannten"],
+                c: 3
+            },
+            {
+                q: "'Melodisches Intervall' bedeutet:",
+                a: ["Gleichzeitig", "Nacheinander", "Nur in Dur", "Nur perfekt"],
+                c: 1
+            },
+            {
+                q: "Welche Intervalle ergeben zusammen eine Oktave?",
+                a: ["Quarte + Quinte", "Zwei große Terzen", "Terz + Sexte", "Alle Antworten richtig"],
+                c: 0
+            }
+        ];
+
+        // App-Zustand
+        let currentQuestion = 0;
+        let userScore = 0;
+        let questions = [];
+        let answered = false;
+
+        function startQuiz() {
+            // Fragen mischen
+            questions = [...quizData].sort(() => Math.random() - 0.5);
+            currentQuestion = 0;
+            userScore = 0;
+            answered = false;
+
+            document.getElementById('startScreen').style.display = 'none';
+            document.getElementById('quizScreen').style.display = 'block';
+            document.getElementById('resultScreen').style.display = 'none';
+
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const q = questions[currentQuestion];
+            answered = false;
+
+            document.getElementById('currentQ').textContent = currentQuestion + 1;
+            document.getElementById('score').textContent = userScore;
+            document.getElementById('questionText').textContent = q.q;
+            document.getElementById('nextButton').disabled = true;
+
+            // Progress
+            const progress = ((currentQuestion) / 30) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+
+            // Antworten
+            const answersDiv = document.getElementById('answersDiv');
+            answersDiv.innerHTML = '';
+
+            q.a.forEach((answer, index) => {
+                const div = document.createElement('div');
+                div.className = 'answer';
+                div.textContent = answer;
+                div.onclick = () => selectAnswer(index);
+                answersDiv.appendChild(div);
+            });
+        }
+
+        function selectAnswer(index) {
+            if (answered) return;
+            answered = true;
+
+            const q = questions[currentQuestion];
+            const answers = document.querySelectorAll('.answer');
+
+            // Antworten färben
+            answers.forEach((answer, i) => {
+                answer.onclick = null;
+                if (i === q.c) {
+                    answer.classList.add('correct');
+                } else if (i === index) {
+                    answer.classList.add('wrong');
+                }
+            });
+
+            // Punkte
+            if (index === q.c) {
+                userScore++;
+                document.getElementById('score').textContent = userScore;
+            }
+
+            document.getElementById('nextButton').disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < 30) {
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'block';
+
+            const percent = Math.round((userScore / 30) * 100);
+            
+            document.getElementById('finalScoreCircle').textContent = percent + '%';
+            document.getElementById('correctAnswers').textContent = userScore + ' / 30';
+            document.getElementById('wrongAnswers').textContent = (30 - userScore) + ' / 30';
+            document.getElementById('percentage').textContent = percent + '%';
+
+            // Nachricht
+            let msg;
+            if (percent >= 90) msg = '🎉 Exzellent! Sie sind ein Gehörbildungs-Experte!';
+            else if (percent >= 80) msg = '🎵 Sehr gut! Beeindruckende Kenntnisse!';
+            else if (percent >= 70) msg = '👏 Gut! Solide Grundlagen vorhanden!';
+            else if (percent >= 60) msg = '📚 Okay! Mit Übung wird es noch besser!';
+            else msg = '💪 Dranbleiben! Übung macht den Meister!';
+
+            document.getElementById('resultMessage').textContent = msg;
+        }
+
+        function restartQuiz() {
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('startScreen').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
