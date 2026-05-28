@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EMP Quiz – HfMT Köln</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">Elementare Musikpädagogik</p>
+        <h1>EMP Multiple-Choice-Quiz</h1>
+        <p class="subtitle">50 Fragen für Studierende der HfMT Köln – ideal für Wiederholung, Einstieg und Seminargespräche.</p>
+      </div>
+      <div class="score-card">
+        <span id="progressText">Frage 1 / 50</span>
+        <strong id="scoreText">0 Punkte</strong>
+      </div>
+    </section>
+
+    <section class="controls" id="startPanel">
+      <h2>Quiz starten</h2>
+      <p>Wähle einen Modus. Im Lernmodus bekommst du nach jeder Antwort direkt Feedback.</p>
+      <div class="button-row">
+        <button id="startLearning" class="primary">Lernmodus</button>
+        <button id="startExam" class="secondary">Prüfungsmodus</button>
+      </div>
+    </section>
+
+    <section class="quiz hidden" id="quizPanel">
+      <div class="progress-bar"><div id="progressBar"></div></div>
+      <div class="meta-row">
+        <span id="categoryTag">Kategorie</span>
+        <span id="modeTag">Lernmodus</span>
+      </div>
+      <h2 id="questionText"></h2>
+      <div id="answers" class="answers"></div>
+      <div id="feedback" class="feedback hidden"></div>
+      <div class="button-row nav-row">
+        <button id="prevBtn" class="ghost">Zurück</button>
+        <button id="nextBtn" class="primary" disabled>Weiter</button>
+      </div>
+    </section>
+
+    <section class="result hidden" id="resultPanel">
+      <p class="eyebrow">Auswertung</p>
+      <h2 id="resultTitle"></h2>
+      <p id="resultText"></p>
+      <div id="reviewList" class="review-list"></div>
+      <div class="button-row">
+        <button id="restartBtn" class="primary">Neu starten</button>
+        <button id="printBtn" class="secondary">Drucken / PDF speichern</button>
+      </div>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
